@@ -445,7 +445,7 @@ Resources:
               if [[ ${OperatingSystem} == "RHEL8" ]] || [[ ${OperatingSystem} == "RHEL9" ]] || [[ ${OperatingSystem} == "SUSE" ]] || [[ ${OperatingSystem} == "Rocky" ]]; then
                 alternatives --set python /usr/bin/python2
               fi
-              DB_PROV_SCRIPT_NAME=provision_db_${Product}.sh
+              DB_PROV_SCRIPT_NAME=provision_db_is_new.sh
 
               pwd
 
