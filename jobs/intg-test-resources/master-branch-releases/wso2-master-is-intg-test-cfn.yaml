@@ -55,6 +55,10 @@ Parameters:
     Description: Database master account password
     MinLength: 6
     ConstraintDescription: minimum - 6 characters
+  DBAllocationStorage:
+    Description: Provide storage size in Gigabytes
+    Type: Number
+    Default: 20
   DBInstanceType:
     Default: db.m4.large
     Description: Database instance class
@@ -82,6 +86,9 @@ Parameters:
       Type: String
       Default: 'true'
       Description: Specify whether DB should be created.
+  ProductPackLocation:
+    Type: String
+    Description: URL for the remote product pack
   KeyPairName:
     Description: >-
       This is used to ssh to the node. If you don't have a key, please create
@@ -126,25 +133,25 @@ Parameters:
       provided standard released pack will be deployed
   Product:
     Type: String
-    Default: wso2am
+    Default: is
     Description: Enter product name
   ProductVersion:
     Type: String
-    Default: 3.2.0
+    Default: 7.1.0-SNAPSHOT
     Description: Enter product version
   OperatingSystem:
     Type: String
-    Default: Ubuntu
+    Default: Rocky
     Description: >-
       Enter target OS. This will be the username of the created EC2 instances as
       well.
   OSVersion:
     Type: String
-    Default: '16.04'
+    Default: '9.3'
     Description: Enter target OS version.
   JDK:
     Type: String
-    Default: ADOPT_OPEN_JDK8
+    Default: ADOPT_OPEN_JDK11
     Description: Enter target JDK version.
     AllowedValues:
       - ADOPT_OPEN_JDK8
@@ -424,7 +431,9 @@ Resources:
               echo "SID=${DBName}" >> cfn-props.properties
               echo "Downloading the product pack from jenkins"
               wget -q '${ProductPackLocation}'	
-              unzip -q wso2${ProductName}-${ProductVersion}*.zip -d $WORKING_DIR	
+              unzip -q wso2${ProductName}-${ProductVersion}*.zip -d $WORKING_DIR
+              PRODUCT_VERSION="7.1.0-SNAPSHOT"
+              mv $WORKING_DIR/wso2${ProductName}-${ProductVersion}* $WORKING_DIR/wso2${ProductName}-$PRODUCT_VERSION
               #add product pack name to cfn properties
               echo "REMOTE_PACK_NAME=${ProductName}-${ProductVersion}" >> cfn-props.properties
               if [[ ${OperatingSystem} == "Ubuntu" ]]; then
@@ -450,7 +459,7 @@ Resources:
               fi
               DB_PROV_SCRIPT_NAME=provision_db_is_new.sh
               DB_CONSOLIDATE_SCRIPT_NAME=consolidate_db_is.sh
-              SCRIPTS_LOCATION=$WORKING_DIR/wso2{ProductName}-${ProductVersion}/dbscripts
+              SCRIPTS_LOCATION=$WORKING_DIR/wso2{ProductName}-$PRODUCT_VERSION/dbscripts
               pwd
 
               /usr/local/bin/aws s3 cp s3://integration-testgrid-resources/db_scripts/$DB_PROV_SCRIPT_NAME $WORKING_DIR
