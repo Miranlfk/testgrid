@@ -111,6 +111,7 @@ Parameters:
       - c7g.2xlarge
       - c6a.xlarge
       - c6a.2xlarge
+      - m4.xlarge
     ConstraintDescription: must be a valid EC2 instance type
   WUMUsername:
     Type: String
@@ -181,6 +182,8 @@ Mappings:
       DBEngine: "postgres_15.3"
     Postgres-16.2:
       DBEngine: "postgres_16.2"
+    Postgres-17.2:
+      DBEngine: "postgres_17.1"
     SQLServer-SE-13.00:
       DBEngine: "sqlserver-se_13.00"
     SQLServer-SE-14.00:
@@ -421,7 +424,7 @@ Resources:
               echo "SID=${DBName}" >> cfn-props.properties
               echo "Downloading the product pack from jenkins"
               wget -q '${ProductPackLocation}'	
-              unzip -q ${ProductName}-${ProductVersion}*.zip -d $WORKING_DIR	
+              unzip -q wso2${ProductName}-${ProductVersion}*.zip -d $WORKING_DIR	
               #add product pack name to cfn properties
               echo "REMOTE_PACK_NAME=${ProductName}-${ProductVersion}" >> cfn-props.properties
               if [[ ${OperatingSystem} == "Ubuntu" ]]; then
@@ -446,10 +449,18 @@ Resources:
                 alternatives --set python /usr/bin/python2
               fi
               DB_PROV_SCRIPT_NAME=provision_db_is_new.sh
-
+              DB_CONSOLIDATE_SCRIPT_NAME=consolidate_db_is.sh
+              SCRIPTS_LOCATION=$WORKING_DIR/wso2{ProductName}-${ProductVersion}/dbscripts
               pwd
 
-              wget https://integration-testgrid-resources.s3.amazonaws.com/db_scripts/$DB_PROV_SCRIPT_NAME
+              /usr/local/bin/aws s3 cp s3://integration-testgrid-resources/db_scripts/$DB_PROV_SCRIPT_NAME $WORKING_DIR
+              /usr/local/bin/aws s3 cp s3://integration-testgrid-resources/db_scripts/$DB_CONSOLIDATE_SCRIPT_NAME $WORKING_DIR
+              /usr/local/bin/aws s3 cp s3://integration-testgrid-resources/db_scripts/is710 $WORKING_DIR --recursive
+              chmod +x $DB_CONSOLIDATE_SCRIPT_NAME
+
+              sed -i "s/CF_DB_NAME/${DBEngine}/g" $DB_CONSOLIDATE_SCRIPT_NAME
+              sed -i "s|CF_SCRIPT_LOCATION|${SCRIPTS_LOCATION}|g" $DB_CONSOLIDATE_SCRIPT_NAME
+              
               chmod +x $DB_PROV_SCRIPT_NAME
 
               echo "Database configs"
@@ -457,13 +468,13 @@ Resources:
               echo $DBEngine
               echo $DBEngineVersion
 
-              sed -i "s/&CF_DB_USERNAME/${DBUsername}/g" $DB_PROV_SCRIPT_NAME
-              sed -i "s/&CF_DB_PASSWORD/${DBPassword}/g" $DB_PROV_SCRIPT_NAME
-              sed -i "s/&CF_DB_HOST/${WSO2DBInstance.Endpoint.Address}/g" $DB_PROV_SCRIPT_NAME
-              sed -i "s/&CF_DB_PORT/${WSO2DBInstance.Endpoint.Port}/g" $DB_PROV_SCRIPT_NAME
-              sed -i "s/&CF_DB_NAME/${DBEngine}/g" $DB_PROV_SCRIPT_NAME
-              sed -i "s/&CF_DB_VERSION/${DBEngineVersion}/g" $DB_PROV_SCRIPT_NAME
-              sed -i "s/&PRODUCT_VERSION/${ProductVersion}/g" $DB_PROV_SCRIPT_NAME
+              sed -i "s/CF_DB_USERNAME/${DBUsername}/g" $DB_PROV_SCRIPT_NAME
+              sed -i "s/CF_DB_PASSWORD/${DBPassword}/g" $DB_PROV_SCRIPT_NAME
+              sed -i "s/CF_DB_HOST/${WSO2DBInstance.Endpoint.Address}/g" $DB_PROV_SCRIPT_NAME
+              sed -i "s/CF_DB_PORT/${WSO2DBInstance.Endpoint.Port}/g" $DB_PROV_SCRIPT_NAME
+              sed -i "s/CF_DB_NAME/${DBEngine}/g" $DB_PROV_SCRIPT_NAME
+              sed -i "s/CF_DB_VERSION/${DBEngineVersion}/g" $DB_PROV_SCRIPT_NAME
+              sed -i "s/PRODUCT_VERSION/${ProductVersion}/g" $DB_PROV_SCRIPT_NAME
               echo ${OperatingSystem}
               if [[ ${OperatingSystem} == "Ubuntu" ]]; then
                 /usr/local/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource WSO2UnixInstance --region ${AWS::Region}

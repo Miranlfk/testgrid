@@ -434,7 +434,7 @@ Resources:
               /usr/local/bin/aws s3 cp s3://wum-for-testgrid/uat-config.json $WORKING_DIR/uat-config.json
               /usr/local/bin/aws s3 cp s3://wum-for-testgrid/uat-nexus-settings.xml $WORKING_DIR/uat-nexus-settings.xml
               echo "Downloading vanilla product ${Product}-${ProductVersion} from AWS S3 completed successfully"
-              /usr/local/bin/aws s3 cp s3://wum-for-testgrid/packs/${Product}-${ProductVersion}.zip $WORKING_DIR
+              /usr/local/bin/aws s3 cp s3://wum-for-testgrid/packs/wso2${Product}-${ProductVersion}.zip $WORKING_DIR
               if [[ ${OperatingSystem} == "Ubuntu" ]]; then
                 echo "Downloading authorized public keys from AWS S3"
                 /usr/local/bin/aws s3 cp s3://integration-testgrid-resources/authorized-public-keys/authorized_keys /home/ubuntu/.ssh/authorized_keys
@@ -449,7 +449,7 @@ Resources:
               DB_PROV_SCRIPT_NAME=provision_db_${Product}.sh
 
               pwd
-
+              
               wget https://integration-testgrid-resources.s3.amazonaws.com/db_scripts/$DB_PROV_SCRIPT_NAME
               chmod +x $DB_PROV_SCRIPT_NAME
 
@@ -458,13 +458,13 @@ Resources:
               echo $DBEngine
               echo $DBEngineVersion
 
-              sed -i "s/&CF_DB_USERNAME/${DBUsername}/g" $DB_PROV_SCRIPT_NAME
-              sed -i "s/&CF_DB_PASSWORD/${DBPassword}/g" $DB_PROV_SCRIPT_NAME
-              sed -i "s/&CF_DB_HOST/${WSO2DBInstance.Endpoint.Address}/g" $DB_PROV_SCRIPT_NAME
-              sed -i "s/&CF_DB_PORT/${WSO2DBInstance.Endpoint.Port}/g" $DB_PROV_SCRIPT_NAME
-              sed -i "s/&CF_DB_NAME/${DBEngine}/g" $DB_PROV_SCRIPT_NAME
-              sed -i "s/&CF_DB_VERSION/${DBEngineVersion}/g" $DB_PROV_SCRIPT_NAME
-              sed -i "s/&PRODUCT_VERSION/${ProductVersion}/g" $DB_PROV_SCRIPT_NAME
+              sed -i "s/CF_DB_USERNAME/${DBUsername}/g" $DB_PROV_SCRIPT_NAME
+              sed -i "s/CF_DB_PASSWORD/${DBPassword}/g" $DB_PROV_SCRIPT_NAME
+              sed -i "s/CF_DB_HOST/${WSO2DBInstance.Endpoint.Address}/g" $DB_PROV_SCRIPT_NAME
+              sed -i "s/CF_DB_PORT/${WSO2DBInstance.Endpoint.Port}/g" $DB_PROV_SCRIPT_NAME
+              sed -i "s/CF_DB_NAME/${DBEngine}/g" $DB_PROV_SCRIPT_NAME
+              sed -i "s/CF_DB_VERSION/${DBEngineVersion}/g" $DB_PROV_SCRIPT_NAME
+              sed -i "s/PRODUCT_VERSION/${ProductVersion}/g" $DB_PROV_SCRIPT_NAME
               echo ${OperatingSystem}
               if [[ ${OperatingSystem} == "Ubuntu" ]]; then
                 /usr/local/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource WSO2UnixInstance --region ${AWS::Region}
