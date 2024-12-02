@@ -422,7 +422,7 @@ Resources:
               wget -q '${ProductPackLocation}'	
               unzip -q wso2${ProductName}-${ProductVersion}*.zip -d $WORKING_DIR
               PRODUCT_VERSION="7.1.0-SNAPSHOT"
-              mv $WORKING_DIR/wso2${ProductName}-${ProductVersion}* $WORKING_DIR/wso2${ProductName}-$PRODUCT_VERSION
+              mv $WORKING_DIR/wso2${ProductName}-${ProductVersion}* $WORKING_DIR/wso2${ProductName}-${PRODUCT_VERSION}
               #add product pack name to cfn properties
               echo "REMOTE_PACK_NAME=${ProductName}-${ProductVersion}" >> cfn-props.properties
               if [[ ${OperatingSystem} == "Ubuntu" ]]; then
@@ -448,7 +448,7 @@ Resources:
               fi
               DB_PROV_SCRIPT_NAME=provision_db_is_new.sh
               DB_CONSOLIDATE_SCRIPT_NAME=consolidate_db_is.sh
-              SCRIPTS_LOCATION=$WORKING_DIR/wso2{ProductName}-$PRODUCT_VERSION/dbscripts
+              SCRIPTS_LOCATION=$WORKING_DIR/wso2${ProductName}-${PRODUCT_VERSION}/dbscripts
               pwd
 
               /usr/local/bin/aws s3 cp s3://integration-testgrid-resources/db_scripts/$DB_PROV_SCRIPT_NAME $WORKING_DIR
@@ -458,7 +458,7 @@ Resources:
 
               sed -i "s/CF_DB_NAME/${DBEngine}/g" $DB_CONSOLIDATE_SCRIPT_NAME
               sed -i "s|CF_SCRIPT_LOCATION|${SCRIPTS_LOCATION}|g" $DB_CONSOLIDATE_SCRIPT_NAME
-              
+
               chmod +x $DB_PROV_SCRIPT_NAME
 
               echo "Database configs"
@@ -472,7 +472,9 @@ Resources:
               sed -i "s/CF_DB_PORT/${WSO2DBInstance.Endpoint.Port}/g" $DB_PROV_SCRIPT_NAME
               sed -i "s/CF_DB_NAME/${DBEngine}/g" $DB_PROV_SCRIPT_NAME
               sed -i "s/CF_DB_VERSION/${DBEngineVersion}/g" $DB_PROV_SCRIPT_NAME
-              sed -i "s/PRODUCT_VERSION/$PRODUCT_VERSION}/g" $DB_PROV_SCRIPT_NAME
+              sed -i "s/PRODUCT_VERSION/${PRODUCT_VERSION}/g" $DB_PROV_SCRIPT_NAME
+              sed -i "s/CF_DBMS_NAME/${DBEngine}/g" $DB_PROV_SCRIPT_NAME
+              sed -i "s|CF_SCRIPT_LOCATION|${SCRIPTS_LOCATION}|g" $DB_PROV_SCRIPT_NAME
               echo ${OperatingSystem}
               if [[ ${OperatingSystem} == "Ubuntu" ]]; then
                 /usr/local/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource WSO2UnixInstance --region ${AWS::Region}
