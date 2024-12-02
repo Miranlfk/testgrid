@@ -120,20 +120,9 @@ Parameters:
       - c6a.2xlarge
       - m4.xlarge
     ConstraintDescription: must be a valid EC2 instance type
-  WUMUsername:
+  ProductName:
     Type: String
-    Default: ''
-    Description: Enter WUM user name
-  WUMPassword:
-    Type: String
-    Default: ''
-    NoEcho: true
-    Description: >-
-      Enter WUM user password to get the updated WSO2 products deployed. If not
-      provided standard released pack will be deployed
-  Product:
-    Type: String
-    Default: is
+    Default: wso2am
     Description: Enter product name
   ProductVersion:
     Type: String
@@ -483,7 +472,7 @@ Resources:
               sed -i "s/CF_DB_PORT/${WSO2DBInstance.Endpoint.Port}/g" $DB_PROV_SCRIPT_NAME
               sed -i "s/CF_DB_NAME/${DBEngine}/g" $DB_PROV_SCRIPT_NAME
               sed -i "s/CF_DB_VERSION/${DBEngineVersion}/g" $DB_PROV_SCRIPT_NAME
-              sed -i "s/PRODUCT_VERSION/${ProductVersion}/g" $DB_PROV_SCRIPT_NAME
+              sed -i "s/PRODUCT_VERSION/$PRODUCT_VERSION}/g" $DB_PROV_SCRIPT_NAME
               echo ${OperatingSystem}
               if [[ ${OperatingSystem} == "Ubuntu" ]]; then
                 /usr/local/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource WSO2UnixInstance --region ${AWS::Region}
