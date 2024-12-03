@@ -122,7 +122,7 @@ Parameters:
     ConstraintDescription: must be a valid EC2 instance type
   ProductName:
     Type: String
-    Default: wso2am
+    Default: wso2is
     Description: Enter product name
   ProductVersion:
     Type: String
@@ -588,7 +588,7 @@ Resources:
     Properties:
       AllocatedStorage: !Ref DBAllocatedStorage
       DBInstanceClass: db.m5.large
-      DBInstanceIdentifier: !Join [ '-', [ 'APIM', !Ref 'UniqueIdentifier' ] ]
+      DBInstanceIdentifier: !Join [ '-', [ 'IS', !Ref 'UniqueIdentifier' ] ]
       DBName: !If [UseSQLServerDB, "", WSO2AMDB]
       LicenseModel: !If [UseLicensedVersion, license-included, !Ref 'AWS::NoValue']
       EngineVersion: !Select [1, !Split ["_", !FindInMap [ DBEngineMap, !Ref DB, DBEngine]]]
@@ -608,7 +608,7 @@ Resources:
         id: 5352b4e9-46ed-4a23-8bdc-bafc3666cbbd
 Outputs:
   WSO2MgtConsoleURL:
-    Value: !If [IsUnix, !Sub 'https://${WSO2UnixInstance.PublicDnsName}:9443/carbon', !If [IsWindows, !Sub 'https://${WSO2WindowsInstance.PublicDnsName}:9443/carbon', !Ref 'AWS::NoValue']]
+    Value: !If [IsUnix, !Sub 'https://${WSO2UnixInstance.PublicDnsName}:9443/carbon/admin/login.jsp', !If [IsWindows, !Sub 'https://${WSO2WindowsInstance.PublicDnsName}:9443/carbon/admin/login.jsp', !Ref 'AWS::NoValue']]
     Description: Access URL of the Management Console
   WSO2PublicIP:
     Value: !If [IsUnix, !Sub '${WSO2UnixInstance.PublicIp}', !If [IsWindows, !Sub '${WSO2WindowsInstance.PublicIp}', !Ref 'AWS::NoValue']]
