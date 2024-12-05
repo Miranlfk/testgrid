@@ -423,8 +423,8 @@ Resources:
               wget -q '${ProductPackLocation}'	
               unzip -q wso2${ProductName}-${ProductVersion}*.zip -d $WORKING_DIR
               PRODUCT_VERSION="7.1.0-SNAPSHOT"
-              ls $WORKING_DIR/wso2${ProductName}-${ProductVersion}
-              mv $WORKING_DIR/wso2${ProductName}-${ProductVersion}* $WORKING_DIR/wso2${ProductName}-$PRODUCT_VERSION
+              mkdir -p $WORKING_DIR/wso2${ProductName}-$PRODUCT_VERSION
+              cp -r $WORKING_DIR/wso2${ProductName}-${ProductVersion}/* $WORKING_DIR/wso2${ProductName}-$PRODUCT_VERSION/
               #add product pack name to cfn properties
               echo "REMOTE_PACK_NAME=${ProductName}-${ProductVersion}" >> cfn-props.properties
               if [[ ${OperatingSystem} == "Ubuntu" ]]; then
@@ -439,6 +439,7 @@ Resources:
               /usr/local/bin/aws configure set default.region us-east-1
               /usr/local/bin/aws s3 cp s3://wum-for-testgrid/uat-config.json $WORKING_DIR/uat-config.json
               /usr/local/bin/aws s3 cp s3://wum-for-testgrid/uat-nexus-settings.xml $WORKING_DIR/uat-nexus-settings.xml
+              /usr/local/bin/aws s3 cp wso2${ProductName}-${ProductVersion}*.zip s3://integration-testgrid-resources/iam-release-packs/
               if [[ ${OperatingSystem} == "Ubuntu" ]]; then
                 echo "Downloading authorized public keys from AWS S3"
                 /usr/local/bin/aws s3 cp s3://integration-testgrid-resources/authorized-public-keys/authorized_keys /home/ubuntu/.ssh/authorized_keys
