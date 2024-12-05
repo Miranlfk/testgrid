@@ -417,7 +417,7 @@ Resources:
               echo "CF_DB_USERNAME=${DBUsername}" >> cfn-props.properties
               echo "CF_DB_HOST=${WSO2DBInstance.Endpoint.Address}" >> cfn-props.properties
               echo "CF_DB_PORT=${WSO2DBInstance.Endpoint.Port}" >> cfn-props.properties
-              echo "PRODUCT_PACK_LOCATION=$ProductPackLocation" >> cfn-props.properties
+              echo "PRODUCT_PACK_LOCATION=${ProductPackLocation}" >> cfn-props.properties
               echo "SID=${DBName}" >> cfn-props.properties
               echo "Downloading the product pack from jenkins"
               wget -q '${ProductPackLocation}'	
