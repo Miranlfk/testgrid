@@ -417,11 +417,13 @@ Resources:
               echo "CF_DB_USERNAME=${DBUsername}" >> cfn-props.properties
               echo "CF_DB_HOST=${WSO2DBInstance.Endpoint.Address}" >> cfn-props.properties
               echo "CF_DB_PORT=${WSO2DBInstance.Endpoint.Port}" >> cfn-props.properties
+              echo "PRODUCT_PACK_LOCATION=$ProductPackLocation" >> cfn-props.properties
               echo "SID=${DBName}" >> cfn-props.properties
               echo "Downloading the product pack from jenkins"
               wget -q '${ProductPackLocation}'	
               unzip -q wso2${ProductName}-${ProductVersion}*.zip -d $WORKING_DIR
               PRODUCT_VERSION="7.1.0-SNAPSHOT"
+              ls $WORKING_DIR/wso2${ProductName}-${ProductVersion}
               mv $WORKING_DIR/wso2${ProductName}-${ProductVersion}* $WORKING_DIR/wso2${ProductName}-$PRODUCT_VERSION
               #add product pack name to cfn properties
               echo "REMOTE_PACK_NAME=${ProductName}-${ProductVersion}" >> cfn-props.properties
