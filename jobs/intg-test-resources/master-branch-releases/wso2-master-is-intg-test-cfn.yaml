@@ -439,7 +439,7 @@ Resources:
               /usr/local/bin/aws configure set default.region us-east-1
               /usr/local/bin/aws s3 cp s3://wum-for-testgrid/uat-config.json $WORKING_DIR/uat-config.json
               /usr/local/bin/aws s3 cp s3://wum-for-testgrid/uat-nexus-settings.xml $WORKING_DIR/uat-nexus-settings.xml
-              /usr/local/bin/aws s3 cp wso2${ProductName}-${ProductVersion}*.zip s3://integration-testgrid-resources/iam-release-packs/
+              /usr/local/bin/aws s3 cp $WORKKING_DIR/wso2${ProductName}-${ProductVersion}.zip s3://integration-testgrid-resources/iam-release-packs/
               if [[ ${OperatingSystem} == "Ubuntu" ]]; then
                 echo "Downloading authorized public keys from AWS S3"
                 /usr/local/bin/aws s3 cp s3://integration-testgrid-resources/authorized-public-keys/authorized_keys /home/ubuntu/.ssh/authorized_keys
