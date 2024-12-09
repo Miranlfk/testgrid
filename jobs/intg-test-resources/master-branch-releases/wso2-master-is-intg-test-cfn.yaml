@@ -421,7 +421,7 @@ Resources:
               echo "SID=${DBName}" >> cfn-props.properties
               echo "Downloading the product pack from jenkins"
               wget -q '${ProductPackLocation}'	
-              unzip -q wso2${ProductName}-${ProductVersion}*.zip -d $WORKING_DIR
+              unzip wso2${ProductName}-${ProductVersion}.zip -d $WORKING_DIR/wso2${ProductName}-${ProductVersion}
               PRODUCT_VERSION="7.1.0-SNAPSHOT"
               mkdir -p $WORKING_DIR/wso2${ProductName}-$PRODUCT_VERSION
               cp -r $WORKING_DIR/wso2${ProductName}-${ProductVersion}/* $WORKING_DIR/wso2${ProductName}-$PRODUCT_VERSION/
