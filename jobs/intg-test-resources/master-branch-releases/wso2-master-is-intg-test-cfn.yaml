@@ -439,7 +439,7 @@ Resources:
               else
                 wget -q '${ProductPackLocation}' -O $WORKING_DIR/wso2${ProductName}-${ProductVersion}.zip
               fi
-              unzip wso2${ProductName}-${ProductVersion}.zip -d $WORKING_DIR/wso2${ProductName}-${ProductVersion}
+              unzip wso2${ProductName}-${ProductVersion}.zip -d $WORKING_DIR
               PRODUCT_VERSION="7.1.0-SNAPSHOT"
               mkdir -p $WORKING_DIR/wso2${ProductName}-$PRODUCT_VERSION
               cp -r $WORKING_DIR/wso2${ProductName}-${ProductVersion}/* $WORKING_DIR/wso2${ProductName}-$PRODUCT_VERSION/
@@ -462,6 +462,7 @@ Resources:
 
               /usr/local/bin/aws s3 cp s3://integration-testgrid-resources/db_scripts/$DB_PROV_SCRIPT_NAME $WORKING_DIR
               /usr/local/bin/aws s3 cp s3://integration-testgrid-resources/db_scripts/$DB_CONSOLIDATE_SCRIPT_NAME $WORKING_DIR
+              mkdir -p $WORKING_DIR/is710
               /usr/local/bin/aws s3 cp s3://integration-testgrid-resources/db_scripts/is710 $WORKING_DIR --recursive
               chmod +x $DB_CONSOLIDATE_SCRIPT_NAME
 
@@ -469,9 +470,9 @@ Resources:
               sed -i "s|CF_SCRIPT_LOCATION|$SCRIPTS_LOCATION|g" $DB_CONSOLIDATE_SCRIPT_NAME
 
               chmod +x $DB_PROV_SCRIPT_NAME
-              bash $DB_CONSOLIDATE_SCRIPT_NAME
 
               echo "Database configs"
+              $WORKING_DIR/$DB_CONSOLIDATE_SCRIPT_NAME
 
               echo $DBEngine
               echo $DBEngineVersion
