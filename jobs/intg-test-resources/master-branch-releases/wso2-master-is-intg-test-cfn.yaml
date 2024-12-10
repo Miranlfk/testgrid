@@ -419,12 +419,7 @@ Resources:
               echo "CF_DB_PORT=${WSO2DBInstance.Endpoint.Port}" >> cfn-props.properties
               echo "PRODUCT_PACK_LOCATION=${ProductPackLocation}" >> cfn-props.properties
               echo "SID=${DBName}" >> cfn-props.properties
-              echo "Downloading the product pack from jenkins"
-              wget -q '${ProductPackLocation}'	
-              unzip wso2${ProductName}-${ProductVersion}.zip -d $WORKING_DIR/wso2${ProductName}-${ProductVersion}
-              PRODUCT_VERSION="7.1.0-SNAPSHOT"
-              mkdir -p $WORKING_DIR/wso2${ProductName}-$PRODUCT_VERSION
-              cp -r $WORKING_DIR/wso2${ProductName}-${ProductVersion}/* $WORKING_DIR/wso2${ProductName}-$PRODUCT_VERSION/
+    
               #add product pack name to cfn properties
               echo "REMOTE_PACK_NAME=${ProductName}-${ProductVersion}" >> cfn-props.properties
               if [[ ${OperatingSystem} == "Ubuntu" ]]; then
@@ -437,13 +432,17 @@ Resources:
               /usr/local/bin/aws configure set aws_access_key_id '${AWSAccessKeyId}'
               /usr/local/bin/aws configure set aws_secret_access_key '${AWSAccessKeySecret}'
               /usr/local/bin/aws configure set default.region us-east-1
-              
-              if [[ -f "$WORKING_DIR/wso2${ProductName}-${ProductVersion}.zip" ]]; then
-                echo "File exists, proceeding with upload"
-                /usr/local/bin/aws s3 cp $WORKING_DIR/wso2${ProductName}-${ProductVersion}.zip s3://integration-testgrid-resources/iam-release-packs/
+
+              echo "Downloading the product pack"
+              if [[ "${ProductVersion}" == *"SNAPSHOT"* ]]; then
+                aws s3 cp s3://integration-testgrid-resources/iam-release-packs/wso2${ProductName}-${ProductVersion}.zip $WORKING_DIR/wso2${ProductName}-${ProductVersion}.zip
               else
-                echo "File does not exist: $WORKING_DIR/wso2${ProductName}-${ProductVersion}.zip"
+                wget -q '${ProductPackLocation}' -O $WORKING_DIR/wso2${ProductName}-${ProductVersion}.zip
               fi
+              unzip wso2${ProductName}-${ProductVersion}.zip -d $WORKING_DIR/wso2${ProductName}-${ProductVersion}
+              PRODUCT_VERSION="7.1.0-SNAPSHOT"
+              mkdir -p $WORKING_DIR/wso2${ProductName}-$PRODUCT_VERSION
+              cp -r $WORKING_DIR/wso2${ProductName}-${ProductVersion}/* $WORKING_DIR/wso2${ProductName}-$PRODUCT_VERSION/
 
               /usr/local/bin/aws s3 cp s3://wum-for-testgrid/uat-config.json $WORKING_DIR/uat-config.json
               /usr/local/bin/aws s3 cp s3://wum-for-testgrid/uat-nexus-settings.xml $WORKING_DIR/uat-nexus-settings.xml
