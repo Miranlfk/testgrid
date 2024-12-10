@@ -470,6 +470,7 @@ Resources:
               sed -i "s|CF_SCRIPT_LOCATION|$SCRIPTS_LOCATION|g" $DB_CONSOLIDATE_SCRIPT_NAME
 
               chmod +x $DB_PROV_SCRIPT_NAME
+              bash $DB_CONSOLIDATE_SCRIPT_NAME
 
               echo "Database configs"
 
