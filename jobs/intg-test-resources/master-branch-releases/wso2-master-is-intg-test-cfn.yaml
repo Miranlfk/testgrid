@@ -438,6 +438,7 @@ Resources:
                 aws s3 cp s3://integration-testgrid-resources/iam-release-packs/wso2${ProductName}-${ProductVersion}.zip $WORKING_DIR/wso2${ProductName}-${ProductVersion}.zip
               else
                 wget -q '${ProductPackLocation}' -O $WORKING_DIR/wso2${ProductName}-${ProductVersion}.zip
+                aws s3 cp $WORKING_DIR/wso2${ProductName}-${ProductVersion}.zip s3://integration-testgrid-resources/iam-release-packs/ --acl bucket-owner-full-control
               fi
               unzip wso2${ProductName}-${ProductVersion}.zip -d $WORKING_DIR
               PRODUCT_VERSION="7.1.0-SNAPSHOT"
