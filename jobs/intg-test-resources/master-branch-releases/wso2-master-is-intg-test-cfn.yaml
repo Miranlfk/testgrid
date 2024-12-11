@@ -410,8 +410,8 @@ Resources:
               WORKING_DIR=$(pwd)
 
               # write property file
-              echo "DB_TYPE=${DBEngine}" > cfn-props.properties
-              echo "CF_DB_VERSION=${DBEngineVersion}" >> cfn-props.properties
+              echo "CF_DBMS_NAME=${DBEngine}" > cfn-props.properties
+              echo "CF_DBMS_VERSION=${DBEngineVersion}" >> cfn-props.properties
               echo "JDK_TYPE=${JDK}" >> cfn-props.properties
               echo "CF_DB_PASSWORD=${DBPassword}" >> cfn-props.properties
               echo "CF_DB_USERNAME=${DBUsername}" >> cfn-props.properties
@@ -464,10 +464,10 @@ Resources:
               /usr/local/bin/aws s3 cp s3://integration-testgrid-resources/db_scripts/$DB_PROV_SCRIPT_NAME $WORKING_DIR
               /usr/local/bin/aws s3 cp s3://integration-testgrid-resources/db_scripts/$DB_CONSOLIDATE_SCRIPT_NAME $WORKING_DIR
               mkdir -p $WORKING_DIR/is710
-              /usr/local/bin/aws s3 cp s3://integration-testgrid-resources/db_scripts/is710 $WORKING_DIR --recursive
+              /usr/local/bin/aws s3 cp s3://integration-testgrid-resources/db_scripts/is710 $WORKING_DIR/is710/ --recursive
               chmod +x $DB_CONSOLIDATE_SCRIPT_NAME
 
-              sed -i "s/CF_DB_NAME/${DBEngine}/g" $DB_CONSOLIDATE_SCRIPT_NAME
+              sed -i "s/CF_DBMS_NAME/${DBEngine}/g" $DB_CONSOLIDATE_SCRIPT_NAME
               sed -i "s|CF_SCRIPT_LOCATION|$SCRIPTS_LOCATION|g" $DB_CONSOLIDATE_SCRIPT_NAME
 
               chmod +x $DB_PROV_SCRIPT_NAME
@@ -482,8 +482,8 @@ Resources:
               sed -i "s/CF_DB_PASSWORD/${DBPassword}/g" $DB_PROV_SCRIPT_NAME
               sed -i "s/CF_DB_HOST/${WSO2DBInstance.Endpoint.Address}/g" $DB_PROV_SCRIPT_NAME
               sed -i "s/CF_DB_PORT/${WSO2DBInstance.Endpoint.Port}/g" $DB_PROV_SCRIPT_NAME
-              sed -i "s/CF_DB_NAME/${DBEngine}/g" $DB_PROV_SCRIPT_NAME
-              sed -i "s/CF_DB_VERSION/${DBEngineVersion}/g" $DB_PROV_SCRIPT_NAME
+              sed -i "s/CF_DBMS_NAME/${DBEngine}/g" $DB_PROV_SCRIPT_NAME
+              sed -i "s/CF_DBMS_VERSION/${DBEngineVersion}/g" $DB_PROV_SCRIPT_NAME
               sed -i "s/PRODUCT_VERSION/$PRODUCT_VERSION/g" $DB_PROV_SCRIPT_NAME
               sed -i "s/CF_DBMS_NAME/${DBEngine}/g" $DB_PROV_SCRIPT_NAME
               echo ${OperatingSystem}
