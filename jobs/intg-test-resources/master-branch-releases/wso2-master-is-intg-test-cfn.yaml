@@ -434,13 +434,7 @@ Resources:
               /usr/local/bin/aws configure set default.region us-east-1
 
               echo "Downloading the product pack"
-              if [[ "${ProductVersion}" == *"SNAPSHOT"* ]]; then
-                wget -q '${ProductPackLocation}' -O $WORKING_DIR/wso2${ProductName}-${ProductVersion}.zip
-                aws s3 cp s3://integration-testgrid-resources/iam-release-packs/wso2${ProductName}-${ProductVersion}.zip $WORKING_DIR/wso2${ProductName}-${ProductVersion}.zip
-              else
-                wget -q '${ProductPackLocation}' -O $WORKING_DIR/wso2${ProductName}-${ProductVersion}.zip
-                aws s3 cp $WORKING_DIR/${ProductName}-${ProductVersion}.zip s3://integration-testgrid-resources/iam-release-packs/ --acl bucket-owner-full-control
-              fi
+              wget -q '${ProductPackLocation}' -O $WORKING_DIR/wso2${ProductName}-${ProductVersion}.zip
               unzip wso2${ProductName}-${ProductVersion}.zip -d $WORKING_DIR
               PRODUCT_VERSION="7.1.0-SNAPSHOT"
               mkdir -p $WORKING_DIR/wso2${ProductName}-$PRODUCT_VERSION
