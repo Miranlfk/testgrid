@@ -435,6 +435,7 @@ Resources:
 
               echo "Downloading the product pack"
               if [[ "${ProductVersion}" == *"SNAPSHOT"* ]]; then
+                wget -q '${ProductPackLocation}' -O $WORKING_DIR/wso2${ProductName}-${ProductVersion}.zip
                 aws s3 cp s3://integration-testgrid-resources/iam-release-packs/wso2${ProductName}-${ProductVersion}.zip $WORKING_DIR/wso2${ProductName}-${ProductVersion}.zip
               else
                 wget -q '${ProductPackLocation}' -O $WORKING_DIR/wso2${ProductName}-${ProductVersion}.zip
