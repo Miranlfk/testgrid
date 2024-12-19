@@ -221,7 +221,7 @@ Conditions:
  UseLicensedVersion: !Or [ !Equals [sqlserver, !Select [0, !Split ["-", !FindInMap [ DBEngineMap, !Ref DB, DBEngine]]]], !Equals [oracle, !Select [0, !Split ["-", !FindInMap [ DBEngineMap, !Ref DB, DBEngine]]]] ]
 Resources:
   WSO2InstanceSecurityGroup:
-    Type: 'AWS::EC2::SecurityGroup'
+    Type: 'AWS::EC2::SecurityGroup'ssh -i "deployment-prod.pem" root@ec2-107-23-12-24.compute-1.amazonaws.com
     Properties:
       GroupDescription: Security group for IS EC2 compute instances
       SecurityGroupIngress:
@@ -383,7 +383,7 @@ Resources:
               if [[ ${OperatingSystem} == "RHEL9" ]] || [[ ${OperatingSystem} == "Rocky" ]]; then
                 pip install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-py3-latest.tar.gz
               fi
-              if [[ ${OperatingSystem} == "Ubuntu" || ${OperatingSystem} == "UbuntuARM"]]; then
+              if [[ ${OperatingSystem} == "Ubuntu" || ${OperatingSystem} == "UbuntuARM" ]]; then
                 mkdir -p /opt/aws/cfn-bootstrap-venv
                 python3 -m venv /opt/aws/cfn-bootstrap-venv
                 source /opt/aws/cfn-bootstrap-venv/bin/activate
