@@ -154,7 +154,7 @@ Parameters:
       - TEMURIN_OPEN_JDK8
   MavenVersion:
     Type: String
-    Default: '3.3.9'
+    Default: '3.6.3'
     Description: Enter required Maven version.
   CustomUserData:
    Type: String
@@ -200,6 +200,8 @@ Mappings:
     #   img: ami-025def472c84238d3
     Ubuntu:
       img: ami-0b7111b9d78d96a3d
+    Ubuntu-ARM:
+      img: ami-0932ffb346ea84d48
     CentOS:
       img: ami-0199fa59b56678149
     RHEL8:
