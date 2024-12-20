@@ -212,13 +212,22 @@ Mappings:
       img: ami-009fab158dcff70e0
     Rocky:
       img: ami-0bdb0ee5983bfb6aa
-#Conditions
+
 Conditions:
- IsWindows: !Equals [ !Ref OperatingSystem, "Windows" ]
- IsUnix: !Or [ !Equals [ !Ref OperatingSystem, "CentOS"], !Equals [ !Ref OperatingSystem, "Ubuntu" ], !Equals [ !Ref InstanceType, "Ubuntu-ARM" ], !Equals [ !Ref OperatingSystem, "RHEL8" ], !Equals [ !Ref OperatingSystem, "RHEL9" ], !Equals [ !Ref OperatingSystem, "SUSE" ], !Equals [ !Ref OperatingSystem, "Rocky" ]]
- IsDBEnabled : !Not  [ !Equals [ !Ref DBEnabled, "false" ]]
- UseSQLServerDB: !Equals [sqlserver-se, !Select [0, !Split ["_", !FindInMap [ DBEngineMap, !Ref DB, DBEngine]]]]
- UseLicensedVersion: !Or [ !Equals [sqlserver, !Select [0, !Split ["-", !FindInMap [ DBEngineMap, !Ref DB, DBEngine]]]], !Equals [oracle, !Select [0, !Split ["-", !FindInMap [ DBEngineMap, !Ref DB, DBEngine]]]] ]
+  IsWindows: !Equals [ !Ref OperatingSystem, "Windows" ]
+  IsUnix: !Or 
+    - !Equals [ !Ref OperatingSystem, "CentOS"]
+    - !Equals [ !Ref OperatingSystem, "Ubuntu" ]
+    - !Equals [ !Ref OperatingSystem, "Ubuntu-ARM" ]
+    - !Equals [ !Ref OperatingSystem, "RHEL8" ]
+    - !Equals [ !Ref OperatingSystem, "RHEL9" ]
+    - !Equals [ !Ref OperatingSystem, "SUSE" ]
+    - !Equals [ !Ref OperatingSystem, "Rocky" ]
+  IsDBEnabled: !Not [ !Equals [ !Ref DBEnabled, "false" ] ]
+  UseSQLServerDB: !Equals [ sqlserver-se, !Select [0, !Split ["_", !FindInMap [ DBEngineMap, !Ref DB, DBEngine]]]]
+  UseLicensedVersion: !Or 
+    - !Equals [ sqlserver, !Select [0, !Split ["-", !FindInMap [ DBEngineMap, !Ref DB, DBEngine]]]]
+    - !Equals [ oracle, !Select [0, !Split ["-", !FindInMap [ DBEngineMap, !Ref DB, DBEngine]]]]
 Resources:
   WSO2InstanceSecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
