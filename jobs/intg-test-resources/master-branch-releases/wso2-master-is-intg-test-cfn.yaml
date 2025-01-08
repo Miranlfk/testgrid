@@ -215,7 +215,7 @@ Mappings:
     Ubuntu:
       img: ami-0b7111b9d78d96a3d
     Ubuntu-ARM:
-      img: ami-0714e2f180c1f56b7
+      img: ami-0932ffb346ea84d48
     CentOS:
       img: ami-0199fa59b56678149
     RHEL8:
