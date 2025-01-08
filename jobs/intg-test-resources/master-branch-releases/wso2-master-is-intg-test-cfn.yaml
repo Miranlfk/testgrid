@@ -162,6 +162,9 @@ Parameters:
       - ADOPT_OPEN_JDK11
       - ADOPT_OPEN_JDK17
       - ADOPT_OPEN_JDK21
+      - ADOPT_OPEN_JDK11_ARM
+      - ADOPT_OPEN_JDK17_ARM
+      - ADOPT_OPEN_JDK21_ARM
       - TEMURIN_OPEN_JDK8
   MavenVersion:
     Type: String
