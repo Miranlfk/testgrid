@@ -181,6 +181,9 @@ Parameters:
   UniqueIdentifier:
     Type: String
     Default: ""
+  S3OutputBucketLocation:
+    Type: String
+    Default: ""
 Mappings:
   DBEngineMap:
     MySQL-5.7:
@@ -209,6 +212,7 @@ Mappings:
       DBEngine: "oracle-se2_19.0.0.0.ru-2019-10.rur-2019-10.r1"
     Oracle-SE2-21.0:
       DBEngine: "oracle-se2-cdb_21.0.0.0.ru-2024-01.rur-2024-01.r1"
+  
   OperatingSystemAMI:
     # Ubuntu:
     #   img: ami-025def472c84238d3
@@ -460,6 +464,11 @@ Resources:
               /usr/local/bin/aws configure set aws_access_key_id '${AWSAccessKeyId}'
               /usr/local/bin/aws configure set aws_secret_access_key '${AWSAccessKeySecret}'
               /usr/local/bin/aws configure set default.region us-east-1
+
+              aws s3 cp s3://testgrid-pipeline-logs/shutdownvm/instance-shutdown /etc/init.d/instance-shutdown
+              sed -i "s~replace_by_product~wso2is~g" /etc/init.d/instance-shutdown
+              sed -i "s~replace_by_version~${ProductVersion}~g" /etc/init.d/instance-shutdown
+              sed -i "s~replace_by_s3_bucket_location~${S3OutputBucketLocation}/wso2-product-instance~g" /etc/init.d/instance-shutdown
 
               echo "Downloading the product pack"
               wget -q '${ProductPackLocation}' -O $WORKING_DIR/wso2${ProductName}-${ProductVersion}.zip
