@@ -8,7 +8,9 @@ Parameters:
       - MySQL-5.7
       - MySQL-8.0
       - MariaDB-11.4.3
-      - Postgres-12.15
+      - Postgres-12.18
+      - Postgres-13.17
+      - Postgres-14.14
       - Postgres-15.10
       - Postgres-16.6
       - Postgres-17.2
@@ -194,8 +196,12 @@ Mappings:
       DBEngine: "mysql_8.0"
     MariaDB-11.4.3:
       DBEngine: "mariadb_11.4.3"
-    Postgres-12.15:
-      DBEngine: "postgres_12.15"
+    Postgres-12.18:
+      DBEngine: "postgres_12.18"
+    Postgres-13.17:
+      DBEngine: "postgres_13.17"
+    Postgres-14.14:
+      DBEngine: "postgres_14.14"
     Postgres-15.10:
       DBEngine: "postgres_15.10"
     Postgres-16.6:
