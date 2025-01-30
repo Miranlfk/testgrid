@@ -61,7 +61,7 @@ Parameters:
     Type: Number
     Default: 20
   DBInstanceType:
-    Default: db.m4.large
+    Default: db.m4.xlarge
     Description: Database instance class
     Type: String
     AllowedValues:
