@@ -224,9 +224,9 @@ Mappings:
     SQLServer-SE-16.00:
       DBEngine: "sqlserver-se_16.00"
     Oracle-SE2-19.0:
-      DBEngine: "oracle-se2_19.0.0.0.ru-2019-10.rur-2019-10.r1"
+      DBEngine: "oracle-se2_19.0.0.0.ru-2024-07.rur-2024-07.r1"
     Oracle-SE2-21.0:
-      DBEngine: "oracle-se2-cdb_21.0.0.0.ru-2024-01.rur-2024-01.r1"
+      DBEngine: "oracle-se2_21.0.0.0.ru-2024-07.rur-2024-07.r1"
   
   OperatingSystemAMI:
     # Ubuntu:
