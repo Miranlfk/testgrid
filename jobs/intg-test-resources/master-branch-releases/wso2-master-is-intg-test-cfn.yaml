@@ -446,6 +446,7 @@ Resources:
               tar -xzf apache-maven-${MavenVersion}-bin.tar.gz
               ln -fs apache-maven-${MavenVersion} maven
               echo 'export MAVEN_OPTS="-Xmx4096m -Xms2048m"' >> /etc/environment
+              echo 'export MAVEN_OPTS="--add-opens java.base/java.net=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED"' >> /etc/environment
               echo 'export M3_HOME=/opt/testgrid/workspace/maven' >> /etc/environment
               echo PATH=/opt/testgrid/workspace/maven/bin/:$PATH >> /etc/environment
 
