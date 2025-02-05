@@ -108,7 +108,7 @@ Parameters:
   WSO2InstanceType:
     Description: 'EC2 instance type of the WSO2 EI Node [t2.micro is the free tier]'
     Type: String
-    Default: t3.xlarge
+    Default: c7g.2xlarge
     AllowedValues:
       - t2.micro
       - t3.micro
@@ -127,6 +127,10 @@ Parameters:
       - c6a.xlarge
       - c6a.2xlarge
       - c6a.4xlarge
+      - c7g.large
+      - c7g.xlarge
+      - c7g.2xlarge
+      - c7g.4xlarge
       - m4.xlarge
       - m4.2xlarge
       - m4.4xlarge
