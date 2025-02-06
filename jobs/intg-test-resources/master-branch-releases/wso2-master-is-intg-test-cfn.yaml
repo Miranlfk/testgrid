@@ -65,7 +65,7 @@ Parameters:
     Type: Number
     Default: 20
   DBInstanceType:
-    Default: db.m5.xlarge
+    Default: db.r6i.xlarge
     Description: Database instance class
     Type: String
     AllowedValues:
@@ -82,6 +82,10 @@ Parameters:
       - db.m5.xlarge
       - db.m5.2xlarge
       - db.m5.4xlarge
+      - db.r6i.large
+      - db.r6i.xlarge
+      - db.r6i.2xlarge
+      - db.r6i.4xlarge
     ConstraintDescription: must be a valid database instance type
   DBAllocatedStorage:
     Default: 20
@@ -204,7 +208,7 @@ Parameters:
 Mappings:
   DBEngineMap:
     Db2-11.5:
-      DBEngine: "db2_11.5.9.0.sb00046591.r1"
+      DBEngine: "db2_11.5.9.0"
     MySQL-5.7:
       DBEngine: "mysql_5.7"
     MySQL-8.0:
