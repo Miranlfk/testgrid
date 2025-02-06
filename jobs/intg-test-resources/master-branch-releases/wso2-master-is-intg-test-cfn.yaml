@@ -5,6 +5,7 @@ Parameters:
     Type: String
     Default: MySQL-5.7
     AllowedValues:
+      - Db2-11.5
       - MySQL-5.7
       - MySQL-8.0
       - MariaDB-11.4.3
@@ -25,6 +26,7 @@ Parameters:
     Default: mysql
     Description: Database Engine
     AllowedValues:
+      - db2
       - mysql
       - postgres
       - mariadb
@@ -201,6 +203,8 @@ Parameters:
     Default: ""
 Mappings:
   DBEngineMap:
+    Db2-11.5:
+      DBEngine: "db2_11.5.9.0.sb00046591.r1"
     MySQL-5.7:
       DBEngine: "mysql_5.7"
     MySQL-8.0:
