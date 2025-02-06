@@ -26,7 +26,7 @@ Parameters:
     Default: mysql
     Description: Database Engine
     AllowedValues:
-      - db2
+      - db2-se
       - mysql
       - postgres
       - mariadb
@@ -208,7 +208,7 @@ Parameters:
 Mappings:
   DBEngineMap:
     Db2-11.5:
-      DBEngine: "db2_11.5.9.0"
+      DBEngine: "db2-se_11.5"
     MySQL-5.7:
       DBEngine: "mysql_5.7"
     MySQL-8.0:
