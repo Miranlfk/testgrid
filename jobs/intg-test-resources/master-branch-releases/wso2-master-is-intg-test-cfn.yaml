@@ -663,10 +663,13 @@ Resources:
     Condition: 'IsDBEnabled'
     Properties:
       AllocatedStorage: !Ref DBAllocatedStorage
-      DBInstanceClass: db.m5.large
+      DBInstanceClass: db.r6i.xlarge
       DBInstanceIdentifier: !Join [ '-', [ 'IS', !Ref 'UniqueIdentifier' ] ]
-      DBName: !If [UseSQLServerDB, "", WSO2AMDB]
-      LicenseModel: !If [UseLicensedVersion, license-included, !Ref 'AWS::NoValue']
+      DBName: !If [UseSQLServerDB, "", WSO2DB]
+      LicenseModel: !If 
+        - !Equals [ !Ref DB, "Db2-11.5" ]
+        - "license-included"
+        - !If [UseLicensedVersion, "license-included", !Ref 'AWS::NoValue']
       EngineVersion: !Select [1, !Split ["_", !FindInMap [ DBEngineMap, !Ref DB, DBEngine]]]
       Engine: !Select [0, !Split ["_", !FindInMap [ DBEngineMap, !Ref DB, DBEngine]]]
       MasterUsername: !Ref DBUsername
