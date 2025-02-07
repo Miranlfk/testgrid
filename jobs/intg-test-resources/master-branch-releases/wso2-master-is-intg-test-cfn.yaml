@@ -65,7 +65,7 @@ Parameters:
     Type: Number
     Default: 20
   DBInstanceType:
-    Default: db.r6i.xlarge
+    Default: db.m5.xlarge
     Description: Database instance class
     Type: String
     AllowedValues:
@@ -676,7 +676,7 @@ Resources:
     Condition: 'IsDBEnabled'
     Properties:
       AllocatedStorage: !Ref DBAllocatedStorage
-      DBInstanceClass: db.r6i.xlarge
+      DBInstanceClass: !If [IsDB2, db.r6i.xlarge, db.m5.xlarge]
       DBInstanceIdentifier: !Join [ '-', [ 'IS', !Ref 'UniqueIdentifier' ] ]
       DBName: !If [UseSQLServerDB, "", WSO2AMDB]
       LicenseModel:
