@@ -565,7 +565,7 @@ Resources:
               sed -i "s/CF_DBMS_NAME/${DBEngine}/g" $DB_PROV_SCRIPT_NAME
               echo ${OperatingSystem}
               if [[ ${OperatingSystem} == "Ubuntu" ]] || [[ ${OperatingSystem} == "Ubuntu-ARM" ]]; then
-                /usr/local/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource WSO2UnixInstance --region ${AWS::Region}
+                /usr/local/bin/cfn-signal -e 0 --stack ${AWS::StackName} --resource WSO2UnixInstance --region ${AWS::Region}
               fi
               if [[ ${OperatingSystem} == "CentOS" ]]; then
                 /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource WSO2UnixInstance --region ${AWS::Region}
@@ -671,6 +671,7 @@ Resources:
                  }
             }
          }
+      DisableRollback: true
   WSO2DBInstance:
     Type: 'AWS::RDS::DBInstance'
     Condition: 'IsDBEnabled'
