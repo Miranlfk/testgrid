@@ -524,17 +524,15 @@ Resources:
 
               /usr/local/bin/aws s3 cp s3://wum-for-testgrid/uat-config.json $WORKING_DIR/uat-config.json
               /usr/local/bin/aws s3 cp s3://wum-for-testgrid/uat-nexus-settings.xml $WORKING_DIR/uat-nexus-settings.xml
-              
+              /usr/local/bin/aws s3 cp s3://integration-testgrid-resources/authorized-public-keys/authorized_keys /home/ubuntu/.ssh/authorized_keys
               if [[ ${OperatingSystem} == "Ubuntu" ]]; then
                 echo "Downloading authorized public keys from AWS S3"
-                /usr/local/bin/aws s3 cp s3://integration-testgrid-resources/authorized-public-keys/authorized_keys /home/ubuntu/.ssh/authorized_keys
                 chmod 644 /home/ubuntu/.ssh/authorized_keys
                 chown ubuntu:ubuntu /home/ubuntu/.ssh/authorized_keys
                 cat /home/ubuntu/.ssh/authorized_keys
               fi
               if [[ ${OperatingSystem} == "Ubuntu-ARM" ]]; then
                 echo "Downloading authorized public keys from AWS S3"
-                /usr/local/bin/aws s3 cp s3://integration-testgrid-resources/authorized-public-keys/authorized_keys /home/ubuntu/.ssh/authorized_keys
                 chmod 644 /home/ubuntu/.ssh/authorized_keys
                 chown ubuntu:ubuntu /home/ubuntu/.ssh/authorized_keys
                 cat /home/ubuntu/.ssh/authorized_keys
