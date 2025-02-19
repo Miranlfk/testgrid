@@ -671,7 +671,6 @@ Resources:
                  }
             }
          }
-      DisableRollback: true
   WSO2DBInstance:
     Type: 'AWS::RDS::DBInstance'
     Condition: 'IsDBEnabled'
