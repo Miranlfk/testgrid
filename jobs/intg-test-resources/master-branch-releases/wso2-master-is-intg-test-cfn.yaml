@@ -529,6 +529,7 @@ Resources:
                 /usr/local/bin/aws s3 cp s3://integration-testgrid-resources/authorized-public-keys/authorized_keys /home/ubuntu/.ssh/authorized_keys
                 chmod 644 /home/ubuntu/.ssh/authorized_keys
                 chown ubuntu:ubuntu /home/ubuntu/.ssh/authorized_keys
+                cat /home/ubuntu/.ssh/authorized_keys
               fi
               if [[ ${OperatingSystem} == "RHEL8" ]] || [[ ${OperatingSystem} == "RHEL9" ]] || [[ ${OperatingSystem} == "SUSE" ]] || [[ ${OperatingSystem} == "Rocky" ]]; then
                 alternatives --set python /usr/bin/python2
