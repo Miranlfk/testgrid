@@ -441,6 +441,10 @@ Resources:
                 yum -y install git
               fi
               if [[ ${OperatingSystem} == "RHEL8" ]] || [[ ${OperatingSystem} == "RHEL9" ]]; then
+                dnf clean all
+                rm -rf /var/cache/dnf
+                rm -rf /tmp/*
+                rm -rf /var/tmp/*
                 dnf install -y epel-release zip unzip
                 dnf install -y jq
                 dnf update -y
