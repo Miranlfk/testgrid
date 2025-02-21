@@ -411,7 +411,7 @@ Resources:
                   source /etc/environment
                   echo 'Defaults secure_path="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin:/opt/mssql-tools18/bin"' | sudo EDITOR='tee -a' visudo
               fi
-              if [[ ${OperatingSystem} == "CentOS" ]] || [[ ${OperatingSystem} == "RHEL8" ]] || [[ ${OperatingSystem} == "RHEL9" ]] || [[ ${OperatingSystem} == "Rocky" ]]; then
+              if [[ ${OperatingSystem} == "CentOS" ]] || [[ ${OperatingSystem} == "Rocky" ]]; then
                 yum install -y epel-release zip unzip
                 yum install -y jq
                 dnf update -y
@@ -434,14 +434,27 @@ Resources:
                 if [[ ${OperatingSystem} == "CentOS" ]] ; then
                   yum -y install postgresql15
                 fi
-                if [[ ${OperatingSystem} == "RHEL8" ]] || [[ ${OperatingSystem} == "RHEL9" ]] ; then
-                  yum -y install postgresql
-                fi
                 if [[ ${OperatingSystem} == "Rocky" ]]; then
                   dnf -y module enable postgresql:15
                   dnf -y install postgresql-server
                 fi
                 yum -y install git
+              fi
+              if [[ ${OperatingSystem} == "RHEL8" ]] || [[ ${OperatingSystem} == "RHEL9" ]]; then
+                dnf install -y epel-release zip unzip
+                dnf install -y jq
+                dnf update -y
+                dnf install -y wget
+                wget https://packages.microsoft.com/config/rhel/8/prod.repo -O /etc/yum.repos.d/msprod.repo
+                ACCEPT_EULA=Y dnf install -y mssql-tools unixODBC-devel
+                dnf install -y mysql
+                echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bash_profile
+                echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc
+                source ~/.bashrc
+                dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+                dnf install -y postgresql
+                dnf install -y git
+                pip3 install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-py3-latest.tar.gz
               fi
               if [[ ${OperatingSystem} == "SUSE" ]]; then
                 zypper install -y zip unzip
