@@ -438,10 +438,10 @@ Resources:
                   dnf -y module enable postgresql:15
                   dnf -y install postgresql-server
                 fi
-                yum -y install git
                 if [[ ${OperatingSystem} == "RHEL8" ]] || [[ ${OperatingSystem} == "RHEL9" ]] ; then
                   dnf -y install git
                 fi
+                yum -y install git
               fi
               if [[ ${OperatingSystem} == "SUSE" ]]; then
                 zypper install -y zip unzip
