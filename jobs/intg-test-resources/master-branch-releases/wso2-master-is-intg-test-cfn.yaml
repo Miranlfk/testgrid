@@ -495,7 +495,7 @@ Resources:
 
               #add product pack name to cfn properties
               echo "REMOTE_PACK_NAME=${ProductName}-${ProductVersion}" >> cfn-props.properties
-              if [[ ${OperatingSystem} == "Ubuntu" ]]; then
+              if [[ ${OperatingSystem} == "Ubuntu" || ${OperatingSystem} == "Rocky" || ${OperatingSystem} == "RHEL9" ]]; then
                 echo "Installing AWS CLI"
                 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
                 unzip awscliv2.zip
