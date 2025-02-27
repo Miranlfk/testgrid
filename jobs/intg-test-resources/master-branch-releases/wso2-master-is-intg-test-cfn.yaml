@@ -384,7 +384,7 @@ Resources:
               # Set file limits
               sysctl -w fs.file-max=2097152
               sysctl fs.file-nr
-              ulimit -Hn
+              ulimit -Hn 2097152
               ulimit -Sn
 
               if [[ ${OperatingSystem} == "Ubuntu" ]] || [[ ${OperatingSystem} == "Ubuntu-ARM" ]]; then
