@@ -411,14 +411,14 @@ Resources:
                   source /etc/environment
                   echo 'Defaults secure_path="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin:/opt/mssql-tools18/bin"' | sudo EDITOR='tee -a' visudo
               fi
-              if [[ ${OperatingSystem} == "CentOS" ]] || [[ ${OperatingSystem} == "RHEL8" ]] || [[ ${OperatingSystem} == "RHEL9" ]] || [[ ${OperatingSystem} == "Rocky" ]]; then
+              if [[ ${OperatingSystem} == "CentOS" ]] || [[ ${OperatingSystem} == "Rocky" ]]; then
                 yum install -y epel-release zip unzip
                 yum install -y jq
                 dnf update -y
-                dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+                dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
                 yum -y install wget
-                wget https://packages.microsoft.com/config/rhel/7/mssql-server-2017.repo -O /etc/yum.repos.d/mssql-server-2017.repo
-                wget https://packages.microsoft.com/config/rhel/7/prod.repo -O /etc/yum.repos.d/msprod.repo
+                wget https://packages.microsoft.com/config/rhel/9/mssql-server-2022.repo -O /etc/yum.repos.d/mssql-server-2022.repo
+                wget https://packages.microsoft.com/config/rhel/9/prod.repo -O /etc/yum.repos.d/msprod.repo
                 ACCEPT_EULA=Y yum install -y mssql-tools unixODBC-devel
                 yum -y install mysql
                 echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bash_profile
@@ -434,14 +434,46 @@ Resources:
                 if [[ ${OperatingSystem} == "CentOS" ]] ; then
                   yum -y install postgresql15
                 fi
-                if [[ ${OperatingSystem} == "Rocky" ]] || [[ ${OperatingSystem} == "RHEL8" ]] || [[ ${OperatingSystem} == "RHEL9" ]] ; then
+                if [[ ${OperatingSystem} == "Rocky" ]] ; then
                   dnf -y module enable postgresql:15
                   dnf -y install postgresql-server
                 fi
-                if [[ ${OperatingSystem} == "RHEL8" ]] || [[ ${OperatingSystem} == "RHEL9" ]] ; then
-                  dnf -y install git
-                fi
                 yum -y install git
+              fi
+              if [[ ${OperatingSystem} == "RHEL8" ]] || [[ ${OperatingSystem} == "RHEL9" ]]; then
+                yum install -y zip unzip
+                yum install -y jq
+                dnf update -y
+                if [[ ${OperatingSystem} == "RHEL8" ]]; then
+                  dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+                fi
+                if [[ ${OperatingSystem} == "RHEL9" ]]; then
+                  dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
+                fi
+                yum -y install wget
+                if [[ ${OperatingSystem} == "RHEL8" ]]; then
+                  wget https://packages.microsoft.com/config/rhel/8/mssql-server-2019.repo -O /etc/yum.repos.d/mssql-server-2019.repo
+                  wget https://packages.microsoft.com/config/rhel/8/prod.repo -O /etc/yum.repos.d/msprod.repo
+                fi
+                if [[ ${OperatingSystem} == "RHEL9" ]]; then
+                  wget https://packages.microsoft.com/config/rhel/9/mssql-server-2022.repo -O /etc/yum.repos.d/mssql-server-2022.repo
+                  wget https://packages.microsoft.com/config/rhel/9/prod.repo -O /etc/yum.repos.d/msprod.repo
+                fi
+                ACCEPT_EULA=Y yum install -y mssql-tools unixODBC-devel
+                yum -y install mysql
+                echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bash_profile
+                echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc
+                source ~/.bashrc
+                if [[ ${OperatingSystem} == "RHEL8" ]]; then
+                  yum -y install https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+                fi
+                if [[ ${OperatingSystem} == "RHEL9" ]]; then
+                  yum -y install https://download.postgresql.org/pub/repos/yum/reporpms/EL-9-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+                fi
+                yum -y update
+                dnf -y module enable postgresql:15
+                dnf -y install postgresql-server
+                dnf -y install git
               fi
               if [[ ${OperatingSystem} == "SUSE" ]]; then
                 zypper install -y zip unzip
@@ -495,7 +527,7 @@ Resources:
 
               #add product pack name to cfn properties
               echo "REMOTE_PACK_NAME=${ProductName}-${ProductVersion}" >> cfn-props.properties
-              if [[ ${OperatingSystem} == "Ubuntu" || ${OperatingSystem} == "Rocky" || ${OperatingSystem} == "RHEL9" ]]; then
+              if [[ ${OperatingSystem} == "Ubuntu" ]] || [[ ${OperatingSystem} == "Rocky" ]] || [[ ${OperatingSystem} == "RHEL9" ]] || [[ ${OperatingSystem} == "RHEL8" ]] ; then
                 echo "Installing AWS CLI"
                 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
                 unzip awscliv2.zip
