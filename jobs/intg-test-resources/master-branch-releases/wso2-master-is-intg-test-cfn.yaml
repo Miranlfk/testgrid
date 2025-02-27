@@ -474,6 +474,8 @@ Resources:
                 dnf -y module enable postgresql:15
                 dnf -y install postgresql-server
                 dnf -y install git
+                dnf -y install python3
+                dnf -y install python3-pip
               fi
               if [[ ${OperatingSystem} == "SUSE" ]]; then
                 zypper install -y zip unzip
