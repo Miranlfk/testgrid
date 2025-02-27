@@ -476,6 +476,14 @@ Resources:
                 dnf -y install git
                 dnf -y install python3
                 dnf -y install python3-pip
+                set -o verbose
+                set -o xtrace
+
+                # Set file limits
+                sysctl -w fs.file-max=2097152
+                sysctl fs.file-nr
+                ulimit -Hn
+                ulimit -Sn
               fi
               if [[ ${OperatingSystem} == "SUSE" ]]; then
                 zypper install -y zip unzip
