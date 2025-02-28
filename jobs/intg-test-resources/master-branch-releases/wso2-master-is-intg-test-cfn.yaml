@@ -163,7 +163,7 @@ Parameters:
     Description: Enter product name
   ProductVersion:
     Type: String
-    Default: 7.1.0-alpha
+    Default: 7.1.0-rc2
     Description: Enter product version
   OperatingSystem:
     Type: String
@@ -257,6 +257,8 @@ Mappings:
       img: ami-077a8c9eeb949d9d6
     RHEL9:
       img: ami-096bfd34ed91b0a1f
+    RHEL9.5:
+      img: ami-08845287db70c6c75
     SUSE:
       img: ami-009fab158dcff70e0
     Rocky:
@@ -270,6 +272,7 @@ Conditions:
     - !Equals [ !Ref OperatingSystem, "Ubuntu-ARM" ]
     - !Equals [ !Ref OperatingSystem, "RHEL8" ]
     - !Equals [ !Ref OperatingSystem, "RHEL9" ]
+    - !Equals [ !Ref OperatingSystem, "RHEL9.5" ]
     - !Equals [ !Ref OperatingSystem, "SUSE" ]
     - !Equals [ !Ref OperatingSystem, "Rocky" ]
   IsDBEnabled: !Not [ !Equals [ !Ref DBEnabled, "false" ] ]
@@ -444,14 +447,14 @@ Resources:
                 fi
                 yum -y install git
               fi
-              if [[ ${OperatingSystem} == "RHEL8" ]] || [[ ${OperatingSystem} == "RHEL9" ]]; then
+              if [[ ${OperatingSystem} == "RHEL8" ]] || [[ ${OperatingSystem} == "RHEL9" ]] || [[ ${OperatingSystem} == "RHEL9.5" ]]; then
                 yum install -y zip unzip
                 yum install -y jq
                 dnf update -y
                 if [[ ${OperatingSystem} == "RHEL8" ]]; then
                   dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
                 fi
-                if [[ ${OperatingSystem} == "RHEL9" ]]; then
+                if [[ ${OperatingSystem} == "RHEL9" ]] || [[ ${OperatingSystem} == "RHEL9.5" ]]; then
                   dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
                 fi
                 yum -y install wget
@@ -459,7 +462,7 @@ Resources:
                   wget https://packages.microsoft.com/config/rhel/8/mssql-server-2019.repo -O /etc/yum.repos.d/mssql-server-2019.repo
                   wget https://packages.microsoft.com/config/rhel/8/prod.repo -O /etc/yum.repos.d/msprod.repo
                 fi
-                if [[ ${OperatingSystem} == "RHEL9" ]]; then
+                if [[ ${OperatingSystem} == "RHEL9" ]] || [[ ${OperatingSystem} == "RHEL9.5" ]]; then
                   wget https://packages.microsoft.com/config/rhel/9/mssql-server-2022.repo -O /etc/yum.repos.d/mssql-server-2022.repo
                   wget https://packages.microsoft.com/config/rhel/9/prod.repo -O /etc/yum.repos.d/msprod.repo
                 fi
@@ -471,7 +474,7 @@ Resources:
                 if [[ ${OperatingSystem} == "RHEL8" ]]; then
                   yum -y install https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm
                 fi
-                if [[ ${OperatingSystem} == "RHEL9" ]]; then
+                if [[ ${OperatingSystem} == "RHEL9" ]] || [[ ${OperatingSystem} == "RHEL9.5" ]]; then
                   yum -y install https://download.postgresql.org/pub/repos/yum/reporpms/EL-9-x86_64/pgdg-redhat-repo-latest.noarch.rpm
                 fi
                 yum -y update
@@ -480,20 +483,12 @@ Resources:
                 dnf -y install git
                 dnf -y install python3
                 dnf -y install python3-pip
-                set -o verbose
-                set -o xtrace
-
-                # Set file limits
-                sysctl -w fs.file-max=2097152
-                sysctl fs.file-nr
-                ulimit -Hn
-                ulimit -Sn
               fi
               if [[ ${OperatingSystem} == "SUSE" ]]; then
                 zypper install -y zip unzip
                 zypper install -y python-pip
               fi
-              if [[ ${OperatingSystem} == "RHEL9" ]] || [[ ${OperatingSystem} == "Rocky" ]]; then
+              if [[ ${OperatingSystem} == "RHEL9" ]] || [[ ${OperatingSystem} == "Rocky" ]] || [[ ${OperatingSystem} == "RHEL9.5" ]]; then
                 pip install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-py3-latest.tar.gz
               fi
               if [[ ${OperatingSystem} == "Ubuntu" ]] || [[ ${OperatingSystem} == "Ubuntu-ARM" ]]; then
@@ -592,7 +587,7 @@ Resources:
                 chown ubuntu:ubuntu /home/ubuntu/.ssh/authorized_keys
                 cat /home/ubuntu/.ssh/authorized_keys
               fi
-              if [[ ${OperatingSystem} == "RHEL8" ]] || [[ ${OperatingSystem} == "RHEL9" ]] || [[ ${OperatingSystem} == "SUSE" ]] || [[ ${OperatingSystem} == "Rocky" ]]; then
+              if [[ ${OperatingSystem} == "RHEL8" ]] || [[ ${OperatingSystem} == "RHEL9" ]] || [[ ${OperatingSystem} == "SUSE" ]] || [[ ${OperatingSystem} == "Rocky" ]] || [[ ${OperatingSystem} == "RHEL9.5" ]]; then
                 alternatives --set python /usr/bin/python2
               fi
               DB_PROV_SCRIPT_NAME=provision_db_${ProductName}.sh
@@ -632,7 +627,7 @@ Resources:
               if [[ ${OperatingSystem} == "CentOS" ]]; then
                 /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource WSO2UnixInstance --region ${AWS::Region}
               fi
-              if [[ ${OperatingSystem} == "RHEL8" ]] || [[ ${OperatingSystem} == "RHEL9" ]] || [[ ${OperatingSystem} == "Rocky" ]]; then
+              if [[ ${OperatingSystem} == "RHEL8" ]] || [[ ${OperatingSystem} == "RHEL9" ]] || [[ ${OperatingSystem} == "Rocky" ]] || [[ ${OperatingSystem} == "RHEL9.5" ]]; then
                 /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource WSO2UnixInstance --region ${AWS::Region}
               fi
               if [[ ${OperatingSystem} == "SUSE" ]]; then
