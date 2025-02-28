@@ -644,7 +644,7 @@ Resources:
         - Key: Name
           Value: !Join
             - ''
-            - - 'intg-test__'
+            - - 'IAM__intg-test__'
               - !Ref OperatingSystem
               - '__'
               - !Ref DBEngine
