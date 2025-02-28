@@ -133,6 +133,10 @@ Parameters:
       - c6a.xlarge
       - c6a.2xlarge
       - c6a.4xlarge
+      - c6i.large
+      - c6i.xlarge
+      - c6i.2xlarge
+      - c6i.4xlarge
       - c7g.large
       - c7g.xlarge
       - c7g.2xlarge
@@ -252,7 +256,7 @@ Mappings:
     RHEL8:
       img: ami-077a8c9eeb949d9d6
     RHEL9:
-      img: ami-0a82122aa7eac8136
+      img: ami-0a45c8b16782f3406
     SUSE:
       img: ami-009fab158dcff70e0
     Rocky:
