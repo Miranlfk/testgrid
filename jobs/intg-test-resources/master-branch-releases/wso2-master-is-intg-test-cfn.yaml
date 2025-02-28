@@ -254,7 +254,7 @@ Mappings:
     CentOS:
       img: ami-0199fa59b56678149
     RHEL8:
-      img: ami-06b33567562221fb3
+      img: ami-0e01f0edd6f6ad4d5
     RHEL9:
       img: ami-096bfd34ed91b0a1f
     RHEL9.5:
