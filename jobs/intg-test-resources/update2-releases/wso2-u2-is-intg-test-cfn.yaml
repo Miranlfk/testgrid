@@ -98,6 +98,13 @@ Parameters:
       Type: String
       Default: 'true'
       Description: Specify whether DB should be created.
+  WUMPassword:
+    Type: String
+    Default: ""
+    NoEcho: true
+  WUMUsername:
+    Type: String
+    Default: ""
   ProductPackLocation:
     Type: String
     Description: URL for the remote product pack
