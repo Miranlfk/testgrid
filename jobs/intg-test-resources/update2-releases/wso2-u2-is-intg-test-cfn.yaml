@@ -69,9 +69,6 @@ Parameters:
     Description: Database instance class
     Type: String
     AllowedValues:
-      - db.t2.micro
-      - db.t2.small
-      - db.t2.medium
       - db.t2.large
       - db.t2.xlarge
       - db.t2.2xlarge
@@ -81,11 +78,9 @@ Parameters:
       - db.m5.large
       - db.m5.xlarge
       - db.m5.2xlarge
-      - db.m5.4xlarge
       - db.r6i.large
       - db.r6i.xlarge
       - db.r6i.2xlarge
-      - db.r6i.4xlarge
     ConstraintDescription: must be a valid database instance type
   DBAllocatedStorage:
     Default: 20
@@ -123,46 +118,20 @@ Parameters:
     Type: String
     Default: c6a.2xlarge
     AllowedValues:
-      - t2.micro
-      - t3.micro
-      - t3.small
-      - t3.medium
       - t3.large
       - t3.xlarge
       - t3.2xlarge
-      - t4g.micro
-      - t4g.small
-      - t4g.medium
-      - t4g.large
-      - t4g.xlarge
-      - t4g.2xlarge
       - c6a.large
       - c6a.xlarge
       - c6a.2xlarge
       - c6a.4xlarge
-      - c6i.large
-      - c6i.xlarge
-      - c6i.2xlarge
-      - c6i.4xlarge
       - c7g.large
       - c7g.xlarge
       - c7g.2xlarge
       - c7g.4xlarge
       - m4.xlarge
-      - m4.2xlarge
-      - m4.4xlarge
       - m5.large
       - m5.xlarge
-      - m5.2xlarge
-      - m5.4xlarge
-      - m5a.large
-      - m5a.xlarge
-      - m5a.2xlarge
-      - m5a.4xlarge
-      - m6g.large
-      - m6g.xlarge
-      - m6g.2xlarge
-      - m6g.4xlarge
     ConstraintDescription: must be a valid EC2 instance type
   ProductName:
     Type: String
@@ -398,7 +367,7 @@ Resources:
               # Set file limits
               sysctl -w fs.file-max=2097152
               sysctl fs.file-nr
-              ulimit -Hn 2097152
+              ulimit -Hn 
               ulimit -Sn
 
               if [[ ${OperatingSystem} == "Ubuntu" ]] || [[ ${OperatingSystem} == "Ubuntu-ARM" ]]; then
@@ -575,17 +544,9 @@ Resources:
               /usr/local/bin/aws s3 cp s3://wum-for-testgrid/uat-config.json $WORKING_DIR/uat-config.json
               /usr/local/bin/aws s3 cp s3://wum-for-testgrid/uat-nexus-settings.xml $WORKING_DIR/uat-nexus-settings.xml
              
-              if [[ ${OperatingSystem} == "Ubuntu" ]]; then
+              if [[ ${OperatingSystem} == "Ubuntu" ]] || [[ ${OperatingSystem} == "Ubuntu-ARM" ]]; then
                 echo "Downloading authorized public keys from AWS S3"
                 /usr/local/bin/aws s3 cp s3://integration-testgrid-resources/authorized-public-keys/authorized_keys /home/ubuntu/.ssh/authorized_keys
-                chmod 644 /home/ubuntu/.ssh/authorized_keys
-                chown ubuntu:ubuntu /home/ubuntu/.ssh/authorized_keys
-                cat /home/ubuntu/.ssh/authorized_keys
-              fi
-              if [[ ${OperatingSystem} == "Ubuntu-ARM" ]]; then
-                echo "Downloading authorized public keys from AWS S3"
-                /usr/local/bin/aws s3 cp s3://integration-testgrid-resources/authorized-public-keys/authorized_keys /home/ubuntu/.ssh/authorized_keys
-                ls -l /home/ubuntu/.ssh
                 chmod 644 /home/ubuntu/.ssh/authorized_keys
                 chown ubuntu:ubuntu /home/ubuntu/.ssh/authorized_keys
                 cat /home/ubuntu/.ssh/authorized_keys
