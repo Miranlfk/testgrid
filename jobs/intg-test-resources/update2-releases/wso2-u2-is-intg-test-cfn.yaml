@@ -540,7 +540,8 @@ Resources:
               fi
               echo "Downloading the product pack"
               wget -q '${ProductPackLocation}' -O $WORKING_DIR/${ProductName}-${ProductVersion}.zip
-
+              unzip -q $WORKING_DIR/${ProductName}-${ProductVersion}.zip -d $WORKING_DIR
+              
               /usr/local/bin/aws s3 cp s3://wum-for-testgrid/uat-config.json $WORKING_DIR/uat-config.json
               /usr/local/bin/aws s3 cp s3://wum-for-testgrid/uat-nexus-settings.xml $WORKING_DIR/uat-nexus-settings.xml
              
