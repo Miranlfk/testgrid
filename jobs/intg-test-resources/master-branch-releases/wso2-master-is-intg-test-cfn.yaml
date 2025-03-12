@@ -60,18 +60,11 @@ Parameters:
     Description: Database master account password
     MinLength: 6
     ConstraintDescription: minimum - 6 characters
-  DBAllocationStorage:
-    Description: Provide storage size in Gigabytes
-    Type: Number
-    Default: 20
   DBInstanceType:
     Default: db.m5.xlarge
     Description: Database instance class
     Type: String
     AllowedValues:
-      - db.t2.micro
-      - db.t2.small
-      - db.t2.medium
       - db.t2.large
       - db.t2.xlarge
       - db.t2.2xlarge
@@ -116,8 +109,12 @@ Parameters:
     Type: String
     Default: c6a.2xlarge
     AllowedValues:
-      - t4g.xlarge
-      - t4g.2xlarge
+      - t3.micro
+      - t3.small
+      - t3.medium
+      - t3.large
+      - t3.xlarge
+      - t3.2xlarge
       - c6a.large
       - c6a.xlarge
       - c6a.2xlarge
@@ -128,9 +125,8 @@ Parameters:
       - c7g.4xlarge
       - m4.xlarge
       - m4.2xlarge
-      - m4.4xlarge
-      - m5.large
       - m5.xlarge
+      - m5.2xlarge
     ConstraintDescription: must be a valid EC2 instance type
   ProductName:
     Type: String
@@ -558,7 +554,7 @@ Resources:
                   WSO2_PRODUCT_VERSION_SHORT=is710
               fi
               mkdir -p $WORKING_DIR/$WSO2_PRODUCT_VERSION_SHORT
-              /usr/local/bin/aws s3 cp s3://integration-testgrid-resources/db_scripts/is710 $WORKING_DIR/$WSO2_PRODUCT_VERSION_SHORT/ --recursive
+              /usr/local/bin/aws s3 cp s3://integration-testgrid-resources/db_scripts/template_db_engine_scripts/ $WORKING_DIR/$WSO2_PRODUCT_VERSION_SHORT/ --recursive
               chmod +x $DB_CONSOLIDATE_SCRIPT_NAME
 
               sed -i "s/CF_DBMS_NAME/${DBEngine}/g" $DB_CONSOLIDATE_SCRIPT_NAME
