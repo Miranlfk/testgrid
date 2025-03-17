@@ -492,6 +492,9 @@ Resources:
               echo "PRODUCT_PACK_LOCATION=${ProductPackLocation}" >> cfn-props.properties
               echo "SID=${DBName}" >> cfn-props.properties
 
+              wget https://s3.amazonaws.com/wso2logarchiever/log_archiver/log_archiver.sh
+              mv log_archiver.sh /usr/lib/
+              
               #add product pack name to cfn properties
               echo "REMOTE_PACK_NAME=${ProductName}-${ProductVersion}" >> cfn-props.properties
               if [[ ${OperatingSystem} == "Ubuntu" ]] || [[ ${OperatingSystem} == "Rocky" ]] || [[ ${OperatingSystem} == "RHEL9" ]] || [[ ${OperatingSystem} == "RHEL8" ]] ; then
@@ -515,6 +518,9 @@ Resources:
               sed -i "s~replace_by_product~wso2is~g" /etc/init.d/instance-shutdown
               sed -i "s~replace_by_version~${ProductVersion}~g" /etc/init.d/instance-shutdown
               sed -i "s~replace_by_s3_bucket_location~${S3OutputBucketLocation}/wso2-product-instance~g" /etc/init.d/instance-shutdown
+              chmod +x /etc/init.d/instance-shutdown
+              /lib/systemd/systemd-sysv-install enable instance-shutdown
+              systemctl restart instance-shutdown
               if [[ ${ProductName} == "is" ]]; then
                 ProductName="wso2is"
               else
