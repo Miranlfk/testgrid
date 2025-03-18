@@ -60,10 +60,6 @@ Parameters:
     Description: Database master account password
     MinLength: 6
     ConstraintDescription: minimum - 6 characters
-  DBAllocationStorage:
-    Description: Provide storage size in Gigabytes
-    Type: Number
-    Default: 20
   DBInstanceType:
     Default: db.m5.xlarge
     Description: Database instance class
@@ -221,19 +217,13 @@ Mappings:
       DBEngine: "oracle-se2-cdb_21.0.0.0.ru-2024-01.rur-2024-01.r1"
   
   OperatingSystemAMI:
-    # Ubuntu:
-    #   img: ami-025def472c84238d3
     Ubuntu:
       img: ami-0b7111b9d78d96a3d
     Ubuntu-ARM:
       img: ami-0cfd5e80e9f7bef10
-    CentOS:
-      img: ami-0199fa59b56678149
     RHEL8:
       img: ami-0e01f0edd6f6ad4d5
     RHEL9:
-      img: ami-096bfd34ed91b0a1f
-    RHEL9.5:
       img: ami-08845287db70c6c75
     SUSE:
       img: ami-009fab158dcff70e0
@@ -243,12 +233,10 @@ Mappings:
 Conditions:
   IsWindows: !Equals [ !Ref OperatingSystem, "Windows" ]
   IsUnix: !Or 
-    - !Equals [ !Ref OperatingSystem, "CentOS"]
     - !Equals [ !Ref OperatingSystem, "Ubuntu" ]
     - !Equals [ !Ref OperatingSystem, "Ubuntu-ARM" ]
     - !Equals [ !Ref OperatingSystem, "RHEL8" ]
     - !Equals [ !Ref OperatingSystem, "RHEL9" ]
-    - !Equals [ !Ref OperatingSystem, "RHEL9.5" ]
     - !Equals [ !Ref OperatingSystem, "SUSE" ]
     - !Equals [ !Ref OperatingSystem, "Rocky" ]
   IsDBEnabled: !Not [ !Equals [ !Ref DBEnabled, "false" ] ]
@@ -394,7 +382,7 @@ Resources:
                   source /etc/environment
                   echo 'Defaults secure_path="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin:/opt/mssql-tools18/bin"' | sudo EDITOR='tee -a' visudo
               fi
-              if [[ ${OperatingSystem} == "CentOS" ]] || [[ ${OperatingSystem} == "Rocky" ]]; then
+              if [[ ${OperatingSystem} == "Rocky" ]] || [[ ${OperatingSystem} == "SUSE" ]]; then
                 yum install -y epel-release zip unzip
                 yum install -y jq
                 dnf update -y
@@ -414,23 +402,18 @@ Resources:
                 fi
                 yum -y update
                 yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-                if [[ ${OperatingSystem} == "CentOS" ]] ; then
-                  yum -y install postgresql15
-                fi
-                if [[ ${OperatingSystem} == "Rocky" ]] ; then
-                  dnf -y module enable postgresql:15
-                  dnf -y install postgresql-server
-                fi
+                dnf -y module enable postgresql:15
+                dnf -y install postgresql-server
                 yum -y install git
               fi
-              if [[ ${OperatingSystem} == "RHEL8" ]] || [[ ${OperatingSystem} == "RHEL9" ]] || [[ ${OperatingSystem} == "RHEL9.5" ]]; then
+              if [[ ${OperatingSystem} == "RHEL8" ]] || [[ ${OperatingSystem} == "RHEL9" ]]; then
                 yum install -y zip unzip
                 yum install -y jq
                 dnf update -y
                 if [[ ${OperatingSystem} == "RHEL8" ]]; then
                   dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
                 fi
-                if [[ ${OperatingSystem} == "RHEL9" ]] || [[ ${OperatingSystem} == "RHEL9.5" ]]; then
+                if [[ ${OperatingSystem} == "RHEL9" ]]; then
                   dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
                 fi
                 yum -y install wget
@@ -438,7 +421,7 @@ Resources:
                   wget https://packages.microsoft.com/config/rhel/8/mssql-server-2019.repo -O /etc/yum.repos.d/mssql-server-2019.repo
                   wget https://packages.microsoft.com/config/rhel/8/prod.repo -O /etc/yum.repos.d/msprod.repo
                 fi
-                if [[ ${OperatingSystem} == "RHEL9" ]] || [[ ${OperatingSystem} == "RHEL9.5" ]]; then
+                if [[ ${OperatingSystem} == "RHEL9" ]]; then
                   wget https://packages.microsoft.com/config/rhel/9/mssql-server-2022.repo -O /etc/yum.repos.d/mssql-server-2022.repo
                   wget https://packages.microsoft.com/config/rhel/9/prod.repo -O /etc/yum.repos.d/msprod.repo
                 fi
@@ -450,7 +433,7 @@ Resources:
                 if [[ ${OperatingSystem} == "RHEL8" ]]; then
                   yum -y install https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm
                 fi
-                if [[ ${OperatingSystem} == "RHEL9" ]] || [[ ${OperatingSystem} == "RHEL9.5" ]]; then
+                if [[ ${OperatingSystem} == "RHEL9" ]]; then
                   yum -y install https://download.postgresql.org/pub/repos/yum/reporpms/EL-9-x86_64/pgdg-redhat-repo-latest.noarch.rpm
                 fi
                 yum -y update
@@ -464,7 +447,7 @@ Resources:
                 zypper install -y zip unzip
                 zypper install -y python-pip
               fi
-              if [[ ${OperatingSystem} == "RHEL9" ]] || [[ ${OperatingSystem} == "Rocky" ]] || [[ ${OperatingSystem} == "RHEL9.5" ]]; then
+              if [[ ${OperatingSystem} == "RHEL9" ]] || [[ ${OperatingSystem} == "Rocky" ]]; then
                 pip install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-py3-latest.tar.gz
               fi
               if [[ ${OperatingSystem} == "Ubuntu" ]] || [[ ${OperatingSystem} == "Ubuntu-ARM" ]]; then
@@ -475,7 +458,7 @@ Resources:
                 ln -s /opt/aws/cfn-bootstrap-venv/bin/cfn-* /usr/local/bin/
                 deactivate
               fi        
-              if [[ ${OperatingSystem} == "RHEL8" ]] || [[ ${OperatingSystem} == "CentOS" ]] || [[ ${OperatingSystem} == "SUSE" ]]; then
+              if [[ ${OperatingSystem} == "RHEL8" ]] || [[ ${OperatingSystem} == "SUSE" ]]; then
                 pip install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz
               fi
               mkdir -p /opt/testgrid/workspace
@@ -510,6 +493,9 @@ Resources:
               echo "PRODUCT_PACK_LOCATION=${ProductPackLocation}" >> cfn-props.properties
               echo "SID=${DBName}" >> cfn-props.properties
 
+              wget https://s3.amazonaws.com/wso2logarchiever/log_archiver/log_archiver.sh
+              mv log_archiver.sh /usr/lib/
+
               #add product pack name to cfn properties
               echo "REMOTE_PACK_NAME=${ProductName}-${ProductVersion}" >> cfn-props.properties
               if [[ ${OperatingSystem} == "Ubuntu" ]] || [[ ${OperatingSystem} == "Rocky" ]] || [[ ${OperatingSystem} == "RHEL9" ]] || [[ ${OperatingSystem} == "RHEL8" ]] ; then
@@ -533,6 +519,9 @@ Resources:
               sed -i "s~replace_by_product~wso2is~g" /etc/init.d/instance-shutdown
               sed -i "s~replace_by_version~${ProductVersion}~g" /etc/init.d/instance-shutdown
               sed -i "s~replace_by_s3_bucket_location~${S3OutputBucketLocation}/wso2-product-instance~g" /etc/init.d/instance-shutdown
+              chmod +x /etc/init.d/instance-shutdown
+              /lib/systemd/systemd-sysv-install enable instance-shutdown
+              systemctl restart instance-shutdown
               if [[ ${ProductName} == "is" ]]; then
                 ProductName="wso2is"
               else
@@ -587,7 +576,7 @@ Resources:
                   WSO2_PRODUCT_VERSION_SHORT=is710
               fi
               mkdir -p $WORKING_DIR/$WSO2_PRODUCT_VERSION_SHORT
-              /usr/local/bin/aws s3 cp s3://integration-testgrid-resources/db_scripts/is710 $WORKING_DIR/$WSO2_PRODUCT_VERSION_SHORT/ --recursive
+              /usr/local/bin/aws s3 cp s3://integration-testgrid-resources/db_scripts/template_db_engine_scripts/ $WORKING_DIR/$WSO2_PRODUCT_VERSION_SHORT/ --recursive
               chmod +x $DB_CONSOLIDATE_SCRIPT_NAME
 
               sed -i "s/CF_DBMS_NAME/${DBEngine}/g" $DB_CONSOLIDATE_SCRIPT_NAME
@@ -605,8 +594,8 @@ Resources:
               sed -i "s/CF_DB_PASSWORD/${DBPassword}/g" $DB_PROV_SCRIPT_NAME
               sed -i "s/CF_DB_HOST/${WSO2DBInstance.Endpoint.Address}/g" $DB_PROV_SCRIPT_NAME
               sed -i "s/CF_DB_PORT/${WSO2DBInstance.Endpoint.Port}/g" $DB_PROV_SCRIPT_NAME
-              sed -i "s/CF_DB_NAME/${DBEngine}/g" $DB_PROV_SCRIPT_NAME
-              sed -i "s/CF_DB_VERSION/${DBEngineVersion}/g" $DB_PROV_SCRIPT_NAME
+              sed -i "s/CF_DBMS_NAME/${DBEngine}/g" $DB_PROV_SCRIPT_NAME
+              sed -i "s/CF_DBMS_VERSION/${DBEngineVersion}/g" $DB_PROV_SCRIPT_NAME
               sed -i "s/PRODUCT_VERSION/${ProductVersion}/g" $DB_PROV_SCRIPT_NAME
               echo ${OperatingSystem}
               if [[ ${OperatingSystem} == "Ubuntu" ]] || [[ ${OperatingSystem} == "Ubuntu-ARM" ]]; then
