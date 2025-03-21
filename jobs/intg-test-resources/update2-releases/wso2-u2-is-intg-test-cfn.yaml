@@ -554,6 +554,8 @@ Resources:
               
               /usr/local/bin/aws s3 cp s3://integration-testgrid-resources/db_scripts/$DB_PROV_SCRIPT_NAME $WORKING_DIR
               /usr/local/bin/aws s3 cp s3://integration-testgrid-resources/db_scripts/$DB_CONSOLIDATE_SCRIPT_NAME $WORKING_DIR
+              /usr/local/bin/aws s3 cp s3://integration-testgrid-resources/iam-support-scripts/add_u2.xml $WORKING_DIR
+              /usr/local/bin/aws s3 cp s3://integration-testgrid-resources/iam-support-scripts/add-patch-repository.sh $WORKING_DIR
               WSO2_PRODUCT_VERSION=${ProductVersion}
 
               echo "Create DB scripts directory"
