@@ -590,6 +590,7 @@ Resources:
 
               echo $DBEngine
               echo $DBEngineVersion
+              bash /opt/testgrid/workspace/$DB_CONSOLIDATE_SCRIPT_NAME
 
               sed -i "s/CF_DB_USERNAME/${DBUsername}/g" $DB_PROV_SCRIPT_NAME
               sed -i "s/CF_DB_PASSWORD/${DBPassword}/g" $DB_PROV_SCRIPT_NAME
@@ -598,6 +599,7 @@ Resources:
               sed -i "s/CF_DBMS_NAME/${DBEngine}/g" $DB_PROV_SCRIPT_NAME
               sed -i "s/CF_DBMS_VERSION/${DBEngineVersion}/g" $DB_PROV_SCRIPT_NAME
               sed -i "s/PRODUCT_VERSION/${ProductVersion}/g" $DB_PROV_SCRIPT_NAME
+              bash /opt/testgrid/workspace/$DB_PROV_SCRIPT_NAME
               echo ${OperatingSystem}
               if [[ ${OperatingSystem} == "Ubuntu" ]] || [[ ${OperatingSystem} == "Ubuntu-ARM" ]]; then
                 /usr/local/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource WSO2UnixInstance --region ${AWS::Region}
