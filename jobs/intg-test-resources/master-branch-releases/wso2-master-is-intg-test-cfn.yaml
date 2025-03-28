@@ -573,6 +573,7 @@ Resources:
 
               echo $DBEngine
               echo $DBEngineVersion
+              bash /opt/testgrid/workspace/$DB_CONSOLIDATE_SCRIPT_NAME
 
               sed -i "s/CF_DB_USERNAME/${DBUsername}/g" $DB_PROV_SCRIPT_NAME
               sed -i "s/CF_DB_PASSWORD/${DBPassword}/g" $DB_PROV_SCRIPT_NAME
