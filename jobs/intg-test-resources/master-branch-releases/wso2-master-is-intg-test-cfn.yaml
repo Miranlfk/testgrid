@@ -190,10 +190,6 @@ Mappings:
       DBEngine: "mysql_8.0"
     MariaDB-11.4.3:
       DBEngine: "mariadb_11.4.3"
-    Postgres-12.18:
-      DBEngine: "postgres_12.18"
-    Postgres-13.17:
-      DBEngine: "postgres_13.17"
     Postgres-14.14:
       DBEngine: "postgres_14.14"
     Postgres-15.10:
@@ -543,7 +539,7 @@ Resources:
               if [[ ${OperatingSystem} == "RHEL8" ]] || [[ ${OperatingSystem} == "RHEL9" ]] || [[ ${OperatingSystem} == "SUSE" ]] || [[ ${OperatingSystem} == "Rocky" ]]; then
                 alternatives --set python /usr/bin/python2
               fi
-              DB_PROV_SCRIPT_NAME=provision_db_${ProductName}.sh
+              DB_PROV_SCRIPT_NAME=provision_db_is.sh
               DB_CONSOLIDATE_SCRIPT_NAME=consolidate_db_is.sh
               SCRIPTS_LOCATION=$WORKING_DIR/${ProductName}-$PRODUCT_VERSION/dbscripts
               pwd
