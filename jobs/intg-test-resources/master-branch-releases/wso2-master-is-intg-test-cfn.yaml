@@ -375,6 +375,21 @@ Resources:
                   ACCEPT_EULA=Y apt install -y mssql-tools18 unixodbc-dev
                   echo 'export PATH="/opt/mssql-tools18/bin:$PATH"' >> /etc/environment
                   source /etc/environment
+                  apt-get update
+                  apt-get install -y libaio1 wget tar
+
+                  cd /opt
+                  wget https://public.dhe.ibm.com/ibmdl/export/pub/software/data/db2/drivers/odbc_cli/linuxx64_odbc_cli.tar.gz
+                  mkdir db2cli
+                  tar -xzf linuxx64_odbc_cli.tar.gz -C db2cli
+
+                  cd db2cli
+                  ./db2cli install -y
+
+                  echo "export PATH=/opt/ibm/db2/clidriver/bin:\$PATH" >> /etc/profile.d/db2cli.sh
+                  echo "export LD_LIBRARY_PATH=/opt/ibm/db2/clidriver/lib" >> /etc/profile.d/db2cli.sh
+                  chmod +x /etc/profile.d/db2cli.sh
+                  source /etc/profile.d/db2cli.sh
                   echo 'Defaults secure_path="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin:/opt/mssql-tools18/bin"' | sudo EDITOR='tee -a' visudo
               fi
               if [[ ${OperatingSystem} == "Rocky" ]] || [[ ${OperatingSystem} == "SUSE" ]]; then
