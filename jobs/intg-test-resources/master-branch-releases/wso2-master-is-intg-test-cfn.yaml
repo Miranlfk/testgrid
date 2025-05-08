@@ -45,7 +45,7 @@ Parameters:
     MinLength: 1
   DBName:
     Type: String
-    Default: WSO2DB
+    Default: IAMDB
     Description: Database Name
   DBUsername:
     Type: String
@@ -134,7 +134,7 @@ Parameters:
     Description: Enter product name
   ProductVersion:
     Type: String
-    Default: 7.1.0-rc2
+    Default: 7.2.0-m1
     Description: Enter product version
   OperatingSystem:
     Type: String
@@ -144,7 +144,7 @@ Parameters:
       well.
   OSVersion:
     Type: String
-    Default: '9.3'
+    Default: '24.04'
     Description: Enter target OS version.
   JDK:
     Type: String
@@ -306,6 +306,10 @@ Resources:
           FromPort: 1521
           ToPort: 1521
           SourceSecurityGroupName: !Ref WSO2InstanceSecurityGroup
+        - IpProtocol: tcp
+          FromPort: 50000
+          ToPort: 50000
+          SourceSecurityGroupName: !Ref WSO2InstanceSecurityGroup
     Metadata:
       'AWS::CloudFormation::Designer':
         id: d0dcc88f-97f7-4d80-901a-f746d372a295
@@ -377,19 +381,6 @@ Resources:
                   source /etc/environment
                   apt-get update
                   apt-get install -y libaio1 wget tar
-
-                  cd /opt
-                  wget https://public.dhe.ibm.com/ibmdl/export/pub/software/data/db2/drivers/odbc_cli/linuxx64_odbc_cli.tar.gz
-                  mkdir db2cli
-                  tar -xzf linuxx64_odbc_cli.tar.gz -C db2cli
-
-                  cd db2cli
-                  ./db2cli install -y
-
-                  echo "export PATH=/opt/ibm/db2/clidriver/bin:\$PATH" >> /etc/profile.d/db2cli.sh
-                  echo "export LD_LIBRARY_PATH=/opt/ibm/db2/clidriver/lib" >> /etc/profile.d/db2cli.sh
-                  chmod +x /etc/profile.d/db2cli.sh
-                  source /etc/profile.d/db2cli.sh
                   echo 'Defaults secure_path="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin:/opt/mssql-tools18/bin"' | sudo EDITOR='tee -a' visudo
               fi
               if [[ ${OperatingSystem} == "Rocky" ]] || [[ ${OperatingSystem} == "SUSE" ]]; then
@@ -478,7 +469,7 @@ Resources:
 
               echo "Installing Apache Maven"
               wget https://archive.apache.org/dist/maven/maven-3/${MavenVersion}/binaries/apache-maven-${MavenVersion}-bin.tar.gz
-              tar -xzf apache-maven-${MavenVersion}-bin.tar.gz
+              tar -xzf apache-maven-${MavenVersion}-bin.tar.gz 
               ln -fs apache-maven-${MavenVersion} maven
               echo 'export MAVEN_OPTS="-Xmx4096m -Xms2048m"' >> /etc/environment
               echo 'export MAVEN_OPTS="--add-opens java.base/java.net=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED"' >> /etc/environment
@@ -524,7 +515,22 @@ Resources:
               /usr/local/bin/aws configure set aws_access_key_id '${AWSAccessKeyId}'
               /usr/local/bin/aws configure set aws_secret_access_key '${AWSAccessKeySecret}'
               /usr/local/bin/aws configure set default.region us-east-1
-
+              
+              if [[ ${OperatingSystem} == "Ubuntu" ]]; then
+                cd $WORKING_DIR
+                mkdir db2cli && cd db2cli
+                wget https://public.dhe.ibm.com/ibmdl/export/pub/software/data/db2/drivers/odbc_cli/linuxx64_odbc_cli.tar.gz
+                tar -xzf linuxx64_odbc_cli.tar.gz 
+                cd clidriver
+                echo "export IBM_DB_HOME=$WORKING_DIR/db2cli/clidriver" >> /etc/profile.d/db2cli.sh
+                echo "export PATH=$IBM_DB_HOME/bin:$PATH" >> /etc/profile.d/db2cli.sh
+                echo "export LD_LIBRARY_PATH=$IBM_DB_HOME/lib:$LD_LIBRARY_PATH" >> /etc/profile.d/db2cli.sh
+                chmod +x /etc/profile.d/db2cli.sh
+                source /etc/profile.d/db2cli.sh
+                /usr/local/bin/aws s3 cp s3://integration-testgrid-resources/db2_resources $WORKING_DIR/db2cli/clidriver/cfg --recursive
+                bash update_db2_config.sh 
+              fi
+              cd $WORKING_DIR
               aws s3 cp s3://testgrid-pipeline-logs/shutdownvm/instance-shutdown /etc/init.d/instance-shutdown
               sed -i "s~replace_by_product~wso2is~g" /etc/init.d/instance-shutdown
               sed -i "s~replace_by_version~${ProductVersion}~g" /etc/init.d/instance-shutdown
@@ -538,7 +544,7 @@ Resources:
               fi
               echo "Downloading the product pack"
               wget -q '${ProductPackLocation}' -O $WORKING_DIR/${ProductName}-${ProductVersion}.zip
-              unzip ${ProductName}-${ProductVersion}.zip -d $WORKING_DIR
+              unzip -q ${ProductName}-${ProductVersion}.zip -d $WORKING_DIR
 
               /usr/local/bin/aws s3 cp s3://wum-for-testgrid/uat-config.json $WORKING_DIR/uat-config.json
               /usr/local/bin/aws s3 cp s3://wum-for-testgrid/uat-nexus-settings.xml $WORKING_DIR/uat-nexus-settings.xml
@@ -594,6 +600,7 @@ Resources:
               sed -i "s/CF_DBMS_VERSION/${DBEngineVersion}/g" $DB_PROV_SCRIPT_NAME
               sed -i "s/PRODUCT_VERSION/${ProductVersion}/g" $DB_PROV_SCRIPT_NAME
               sed -i "s/CF_DBMS_NAME/${DBEngine}/g" $DB_PROV_SCRIPT_NAME
+              sed -i "s/CF_DB_NAME/${DBName}/g" $DB_PROV_SCRIPT_NAME
               echo ${OperatingSystem}
               if [[ ${OperatingSystem} == "Ubuntu" ]] || [[ ${OperatingSystem} == "Ubuntu-ARM" ]]; then
                 /usr/local/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource WSO2UnixInstance --region ${AWS::Region}
@@ -709,7 +716,7 @@ Resources:
       AllocatedStorage: !Ref DBAllocatedStorage
       DBInstanceClass: !If [IsDB2, db.r6i.xlarge, db.m5.xlarge]
       DBInstanceIdentifier: !Join [ '-', [ 'IS', !Ref 'UniqueIdentifier' ] ]
-      DBName: !If [UseSQLServerDB, "", WSO2AMDB]
+      DBName: !If [UseSQLServerDB, "", IAMDB]
       LicenseModel:
         Fn::If:
           - IsSQLServerOrOracle

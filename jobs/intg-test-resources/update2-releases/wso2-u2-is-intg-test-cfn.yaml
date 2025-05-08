@@ -311,6 +311,10 @@ Resources:
           FromPort: 1521
           ToPort: 1521
           SourceSecurityGroupName: !Ref WSO2InstanceSecurityGroup
+        - IpProtocol: tcp
+          FromPort: 50000
+          ToPort: 50000
+          SourceSecurityGroupName: !Ref WSO2InstanceSecurityGroup
     Metadata:
       'AWS::CloudFormation::Designer':
         id: d0dcc88f-97f7-4d80-901a-f746d372a295
@@ -514,7 +518,20 @@ Resources:
               /usr/local/bin/aws configure set aws_access_key_id '${AWSAccessKeyId}'
               /usr/local/bin/aws configure set aws_secret_access_key '${AWSAccessKeySecret}'
               /usr/local/bin/aws configure set default.region us-east-1
-
+              if [[ ${OperatingSystem} == "Ubuntu" ]]; then
+                cd $WORKING_DIR
+                mkdir db2cli && cd db2cli
+                wget https://public.dhe.ibm.com/ibmdl/export/pub/software/data/db2/drivers/odbc_cli/linuxx64_odbc_cli.tar.gz
+                tar -xzf linuxx64_odbc_cli.tar.gz 
+                cd clidriver
+                echo "export IBM_DB_HOME=$WORKING_DIR/db2cli/clidriver" >> /etc/profile.d/db2cli.sh
+                echo "export PATH=$IBM_DB_HOME/bin:$PATH" >> /etc/profile.d/db2cli.sh
+                echo "export LD_LIBRARY_PATH=$IBM_DB_HOME/lib:$LD_LIBRARY_PATH" >> /etc/profile.d/db2cli.sh
+                chmod +x /etc/profile.d/db2cli.sh
+                source /etc/profile.d/db2cli.sh
+                /usr/local/bin/aws s3 cp s3://integration-testgrid-resources/db2_resources $WORKING_DIR/db2cli/clidriver/cfg --recursive
+                bash update_db2_config.sh 
+              fi
               aws s3 cp s3://testgrid-pipeline-logs/shutdownvm/instance-shutdown /etc/init.d/instance-shutdown
               sed -i "s~replace_by_product~wso2is~g" /etc/init.d/instance-shutdown
               sed -i "s~replace_by_version~${ProductVersion}~g" /etc/init.d/instance-shutdown
