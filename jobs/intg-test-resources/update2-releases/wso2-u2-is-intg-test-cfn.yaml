@@ -14,7 +14,8 @@ Parameters:
       - Postgres-14.14
       - Postgres-15.10
       - Postgres-16.6
-      - Postgres-17.2
+      - Postgres-17.4
+      - Postgres-17.5
       - Oracle-SE2-19.0
       - Oracle-SE2-21.0
       - SQLServer-SE-13.00
@@ -201,8 +202,10 @@ Mappings:
       DBEngine: "postgres_15.10"
     Postgres-16.6:
       DBEngine: "postgres_16.6"
-    Postgres-17.2:
-      DBEngine: "postgres_17.2"
+    Postgres-17.4:
+      DBEngine: "postgres_17.4"
+    Postgres-17.5:
+      DBEngine: "postgres_17.5"
     SQLServer-SE-13.00:
       DBEngine: "sqlserver-se_13.00"
     SQLServer-SE-14.00:
