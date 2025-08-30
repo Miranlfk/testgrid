@@ -48,13 +48,13 @@ else
   if [ $update_exit_code -eq 0 ]; then
     echo "Successfully updated."
     echo `pwd`
-    cd ../../
+    cd ../
     ls
     rm -rf $WSO2_PRODUCT.zip
     ls
     # Check if the directory exists and is not empty
     if [ -d "$WSO2_PRODUCT" ] && [ "$(ls -A $WSO2_PRODUCT)" ]; then
-      zip -r -q $WSO2_PRODUCT.zip $WSO2_PRODUCT
+      zip -r -q $WSO2_PRODUCT.zip . -i $WSO2_PRODUCT
       echo "Successfully zipped $WSO2_PRODUCT."
     else
       echo "Error: Directory $WSO2_PRODUCT is missing or empty. Skipping zipping process."

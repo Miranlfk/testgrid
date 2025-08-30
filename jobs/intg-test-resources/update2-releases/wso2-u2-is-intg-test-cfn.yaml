@@ -572,7 +572,7 @@ Resources:
               wget "https://integration-testgrid-resources.s3.us-east-1.amazonaws.com/iam-support-scripts/wso2-update.sh"
               chmod +x /opt/testgrid/workspace/wso2-update.sh
               /opt/testgrid/workspace/wso2-update.sh ${WUMUsername} ${WUMPassword} wso2is-${ProductVersion}
-              DB_PROV_SCRIPT_NAME=provision_db_${ProductName}.sh
+              DB_PROV_SCRIPT_NAME=provision_db_is.sh
               DB_CONSOLIDATE_SCRIPT_NAME=consolidate_db_is.sh
               SCRIPTS_LOCATION=$WORKING_DIR/${ProductName}-${ProductVersion}/dbscripts
 
