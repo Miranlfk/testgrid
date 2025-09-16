@@ -48,7 +48,7 @@ Parameters:
     MinLength: 1
   DBName:
     Type: String
-    Default: WSO2DB
+    Default: IAMDB
     Description: Database Name
   DBUsername:
     Type: String
@@ -138,7 +138,7 @@ Parameters:
     Description: Enter product name
   ProductVersion:
     Type: String
-    Default: 7.1.0-rc2
+    Default: "7.1.0"
     Description: Enter product version
   OperatingSystem:
     Type: String
@@ -148,7 +148,7 @@ Parameters:
       well.
   OSVersion:
     Type: String
-    Default: '9.3'
+    Default: '24.04'
     Description: Enter target OS version.
   JDK:
     Type: String
@@ -571,7 +571,7 @@ Resources:
               fi
               wget "https://integration-testgrid-resources.s3.us-east-1.amazonaws.com/iam-support-scripts/wso2-update.sh"
               chmod +x /opt/testgrid/workspace/wso2-update.sh
-              /opt/testgrid/workspace/wso2-update.sh ${WUMUsername} ${WUMPassword} wso2is-${ProductVersion}
+              /opt/testgrid/workspace/wso2-update.sh ${WUMUsername} ${WUMPassword}
               DB_PROV_SCRIPT_NAME=provision_db_is.sh
               DB_CONSOLIDATE_SCRIPT_NAME=consolidate_db_is.sh
               SCRIPTS_LOCATION=$WORKING_DIR/${ProductName}-${ProductVersion}/dbscripts
@@ -621,7 +621,7 @@ Resources:
               sed -i "s/CF_DB_PORT/${WSO2DBInstance.Endpoint.Port}/g" $DB_PROV_SCRIPT_NAME
               sed -i "s/CF_DBMS_NAME/${DBEngine}/g" $DB_PROV_SCRIPT_NAME
               sed -i "s/CF_DBMS_VERSION/${DBEngineVersion}/g" $DB_PROV_SCRIPT_NAME
-              sed -i "s/PRODUCT_VERSION/${ProductVersion}/g" $DB_PROV_SCRIPT_NAME
+              sed -i "s/CF_PRODUCT_VERSION/${ProductVersion}/g" $DB_PROV_SCRIPT_NAME
               chmod +x $DB_PROV_SCRIPT_NAME
               bash /opt/testgrid/workspace/$DB_PROV_SCRIPT_NAME
               echo ${OperatingSystem}
@@ -739,7 +739,7 @@ Resources:
       AllocatedStorage: !Ref DBAllocatedStorage
       DBInstanceClass: !If [IsDB2, db.r6i.xlarge, db.m5.xlarge]
       DBInstanceIdentifier: !Join [ '-', [ 'IS', !Ref 'UniqueIdentifier' ] ]
-      DBName: !If [UseSQLServerDB, "", WSO2AMDB]
+      DBName: !If [UseSQLServerDB, "", IAMDB]
       LicenseModel:
         Fn::If:
           - IsSQLServerOrOracle
