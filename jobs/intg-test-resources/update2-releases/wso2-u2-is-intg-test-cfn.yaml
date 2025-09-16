@@ -604,13 +604,10 @@ Resources:
               fi
               mkdir -p $WORKING_DIR/$WSO2_PRODUCT_VERSION_SHORT
               /usr/local/bin/aws s3 cp s3://integration-testgrid-resources/db_scripts/template_db_engine_scripts/ $WORKING_DIR/$WSO2_PRODUCT_VERSION_SHORT/ --recursive
-              chmod +x $DB_CONSOLIDATE_SCRIPT_NAME
 
               sed -i "s/CF_DBMS_NAME/${DBEngine}/g" $DB_CONSOLIDATE_SCRIPT_NAME
               sed -i "s|CF_SCRIPT_LOCATION|$SCRIPTS_LOCATION|g" $DB_CONSOLIDATE_SCRIPT_NAME
               sed -i "s|CF_PRODUCT_VERSION_SHORT|$WSO2_PRODUCT_VERSION_SHORT|g" $DB_CONSOLIDATE_SCRIPT_NAME
-
-              chmod +x $DB_PROV_SCRIPT_NAME
 
               echo "Database configs"
 
@@ -625,6 +622,8 @@ Resources:
               sed -i "s/CF_DBMS_NAME/${DBEngine}/g" $DB_PROV_SCRIPT_NAME
               sed -i "s/CF_DBMS_VERSION/${DBEngineVersion}/g" $DB_PROV_SCRIPT_NAME
               sed -i "s/PRODUCT_VERSION/${ProductVersion}/g" $DB_PROV_SCRIPT_NAME
+              chmod +x $DB_PROV_SCRIPT_NAME
+              bash /opt/testgrid/workspace/$DB_PROV_SCRIPT_NAME
               echo ${OperatingSystem}
               if [[ ${OperatingSystem} == "Ubuntu" ]] || [[ ${OperatingSystem} == "Ubuntu-ARM" ]]; then
                 /usr/local/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource WSO2UnixInstance --region ${AWS::Region}
