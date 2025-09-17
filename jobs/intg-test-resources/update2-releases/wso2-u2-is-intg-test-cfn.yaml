@@ -618,7 +618,7 @@ Resources:
               sed -i "s/CF_DB_USERNAME/${DBUsername}/g" $WORKING_DIR/$DB_PROV_SCRIPT_NAME
               sed -i "s/CF_DB_PASSWORD/${DBPassword}/g" $WORKING_DIR/$DB_PROV_SCRIPT_NAME
               sed -i "s/CF_DB_HOST/${WSO2DBInstance.Endpoint.Address}/g" $WORKING_DIR/$DB_PROV_SCRIPT_NAME
-              sed -i "s/CF_DB_PORT/${WSO2DBInstance.Endpoint.Port}/g" $WORKING_DIR/ $DB_PROV_SCRIPT_NAME
+              sed -i "s/CF_DB_PORT/${WSO2DBInstance.Endpoint.Port}/g" $WORKING_DIR/$DB_PROV_SCRIPT_NAME
               sed -i "s/CF_DBMS_NAME/${DBEngine}/g" $WORKING_DIR/$DB_PROV_SCRIPT_NAME
               sed -i "s/CF_DBMS_VERSION/${DBEngineVersion}/g" $WORKING_DIR/$DB_PROV_SCRIPT_NAME
               sed -i "s/CF_PRODUCT_VERSION/${ProductVersion}/g" $WORKING_DIR/$DB_PROV_SCRIPT_NAME
