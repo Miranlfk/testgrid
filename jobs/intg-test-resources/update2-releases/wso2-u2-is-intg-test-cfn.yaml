@@ -603,7 +603,6 @@ Resources:
                   WSO2_PRODUCT_VERSION_SHORT=is710
               fi
               mkdir -p $WORKING_DIR/$WSO2_PRODUCT_VERSION_SHORT
-              /usr/local/bin/aws s3 cp s3://integration-testgrid-resources/db_scripts/template_db_engine_scripts/ $WORKING_DIR/$WSO2_PRODUCT_VERSION_SHORT/ --recursive
 
               sed -i "s/CF_DBMS_NAME/${DBEngine}/g" $WORKING_DIR/$DB_CONSOLIDATE_SCRIPT_NAME
               sed -i "s|CF_SCRIPT_LOCATION|$SCRIPTS_LOCATION|g" $WORKING_DIR/$DB_CONSOLIDATE_SCRIPT_NAME
