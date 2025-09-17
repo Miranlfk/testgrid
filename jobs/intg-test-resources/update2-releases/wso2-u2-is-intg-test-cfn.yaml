@@ -541,6 +541,7 @@ Resources:
                 /usr/local/bin/aws s3 cp s3://integration-testgrid-resources/db2_resources $WORKING_DIR/db2cli/clidriver/cfg --recursive
                 bash update_db2_config.sh 
               fi
+              cd $WORKING_DIR
               aws s3 cp s3://testgrid-pipeline-logs/shutdownvm/instance-shutdown /etc/init.d/instance-shutdown
               sed -i "s~replace_by_product~wso2is~g" /etc/init.d/instance-shutdown
               sed -i "s~replace_by_version~${ProductVersion}~g" /etc/init.d/instance-shutdown
@@ -569,7 +570,7 @@ Resources:
               if [[ ${OperatingSystem} == "RHEL8" ]] || [[ ${OperatingSystem} == "RHEL9" ]] || [[ ${OperatingSystem} == "SUSE" ]] || [[ ${OperatingSystem} == "Rocky" ]] || [[ ${OperatingSystem} == "RHEL9.5" ]]; then
                 alternatives --set python /usr/bin/python2
               fi
-              wget "https://integration-testgrid-resources.s3.us-east-1.amazonaws.com/iam-support-scripts/wso2-update.sh"
+              wget "https://integration-testgrid-resources.s3.us-east-1.amazonaws.com/iam-support-scripts/wso2-update.sh" $WORKING_DIR/
               chmod +x /opt/testgrid/workspace/wso2-update.sh
               /opt/testgrid/workspace/wso2-update.sh ${WUMUsername} ${WUMPassword}
               DB_PROV_SCRIPT_NAME=provision_db_is.sh
@@ -605,9 +606,9 @@ Resources:
               mkdir -p $WORKING_DIR/$WSO2_PRODUCT_VERSION_SHORT
               /usr/local/bin/aws s3 cp s3://integration-testgrid-resources/db_scripts/template_db_engine_scripts/ $WORKING_DIR/$WSO2_PRODUCT_VERSION_SHORT/ --recursive
 
-              sed -i "s/CF_DBMS_NAME/${DBEngine}/g" $DB_CONSOLIDATE_SCRIPT_NAME
-              sed -i "s|CF_SCRIPT_LOCATION|$SCRIPTS_LOCATION|g" $DB_CONSOLIDATE_SCRIPT_NAME
-              sed -i "s|CF_PRODUCT_VERSION_SHORT|$WSO2_PRODUCT_VERSION_SHORT|g" $DB_CONSOLIDATE_SCRIPT_NAME
+              sed -i "s/CF_DBMS_NAME/${DBEngine}/g" $WORKING_DIR/$DB_CONSOLIDATE_SCRIPT_NAME
+              sed -i "s|CF_SCRIPT_LOCATION|$SCRIPTS_LOCATION|g" $WORKING_DIR/$DB_CONSOLIDATE_SCRIPT_NAME
+              sed -i "s|CF_PRODUCT_VERSION_SHORT|$WSO2_PRODUCT_VERSION_SHORT|g" $WORKING_DIR/$DB_CONSOLIDATE_SCRIPT_NAME
 
               echo "Database configs"
 
@@ -615,14 +616,14 @@ Resources:
               echo $DBEngineVersion
               bash /opt/testgrid/workspace/$DB_CONSOLIDATE_SCRIPT_NAME
 
-              sed -i "s/CF_DB_USERNAME/${DBUsername}/g" $DB_PROV_SCRIPT_NAME
-              sed -i "s/CF_DB_PASSWORD/${DBPassword}/g" $DB_PROV_SCRIPT_NAME
-              sed -i "s/CF_DB_HOST/${WSO2DBInstance.Endpoint.Address}/g" $DB_PROV_SCRIPT_NAME
-              sed -i "s/CF_DB_PORT/${WSO2DBInstance.Endpoint.Port}/g" $DB_PROV_SCRIPT_NAME
-              sed -i "s/CF_DBMS_NAME/${DBEngine}/g" $DB_PROV_SCRIPT_NAME
-              sed -i "s/CF_DBMS_VERSION/${DBEngineVersion}/g" $DB_PROV_SCRIPT_NAME
-              sed -i "s/CF_PRODUCT_VERSION/${ProductVersion}/g" $DB_PROV_SCRIPT_NAME
-              chmod +x $DB_PROV_SCRIPT_NAME
+              sed -i "s/CF_DB_USERNAME/${DBUsername}/g" $WORKING_DIR/$DB_PROV_SCRIPT_NAME
+              sed -i "s/CF_DB_PASSWORD/${DBPassword}/g" $WORKING_DIR/$DB_PROV_SCRIPT_NAME
+              sed -i "s/CF_DB_HOST/${WSO2DBInstance.Endpoint.Address}/g" $WORKING_DIR/$DB_PROV_SCRIPT_NAME
+              sed -i "s/CF_DB_PORT/${WSO2DBInstance.Endpoint.Port}/g" $WORKING_DIR/ $DB_PROV_SCRIPT_NAME
+              sed -i "s/CF_DBMS_NAME/${DBEngine}/g" $WORKING_DIR/$DB_PROV_SCRIPT_NAME
+              sed -i "s/CF_DBMS_VERSION/${DBEngineVersion}/g" $WORKING_DIR/$DB_PROV_SCRIPT_NAME
+              sed -i "s/CF_PRODUCT_VERSION/${ProductVersion}/g" $WORKING_DIR/$DB_PROV_SCRIPT_NAME
+              chmod +x $WORKING_DIR/$DB_PROV_SCRIPT_NAME
               bash /opt/testgrid/workspace/$DB_PROV_SCRIPT_NAME
               echo ${OperatingSystem}
               if [[ ${OperatingSystem} == "Ubuntu" ]] || [[ ${OperatingSystem} == "Ubuntu-ARM" ]]; then
