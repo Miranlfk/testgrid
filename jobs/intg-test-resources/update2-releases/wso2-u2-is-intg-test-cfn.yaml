@@ -11,7 +11,7 @@ Parameters:
       - MySQL-8.4.6
       - MariaDB-11.4.3
       - MariaDB-11.4.8
-      - Postgres-12.18
+      - Postgres-12.22
       - Postgres-13.17
       - Postgres-14.14
       - Postgres-15.10
@@ -198,8 +198,8 @@ Mappings:
       DBEngine: "mariadb_11.4.3"
     MariaDB-11.4.8:
       DBEngine: "mariadb_11.4.8"
-    Postgres-12.18:
-      DBEngine: "postgres_12.18"
+    Postgres-12.22:
+      DBEngine: "postgres_12.22"
     Postgres-13.17:
       DBEngine: "postgres_13.17"
     Postgres-14.14:
@@ -621,7 +621,6 @@ Resources:
               sed -i "s/CF_DBMS_VERSION/${DBEngineVersion}/g" $WORKING_DIR/$DB_PROV_SCRIPT_NAME
               sed -i "s/CF_PRODUCT_VERSION/${ProductVersion}/g" $WORKING_DIR/$DB_PROV_SCRIPT_NAME
               chmod +x $WORKING_DIR/$DB_PROV_SCRIPT_NAME
-              bash /opt/testgrid/workspace/$DB_PROV_SCRIPT_NAME
               echo ${OperatingSystem}
               if [[ ${OperatingSystem} == "Ubuntu" ]] || [[ ${OperatingSystem} == "Ubuntu-ARM" ]]; then
                 /usr/local/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource WSO2UnixInstance --region ${AWS::Region}
