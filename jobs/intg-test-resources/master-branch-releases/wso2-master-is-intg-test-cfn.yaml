@@ -611,7 +611,7 @@ Resources:
               sed -i "s/CF_DB_PORT/${WSO2DBInstance.Endpoint.Port}/g" $DB_PROV_SCRIPT_NAME
               sed -i "s/CF_DBMS_NAME/${DBEngine}/g" $DB_PROV_SCRIPT_NAME
               sed -i "s/CF_DBMS_VERSION/${DBEngineVersion}/g" $DB_PROV_SCRIPT_NAME
-              sed -i "s/PRODUCT_VERSION/${ProductVersion}/g" $DB_PROV_SCRIPT_NAME
+              sed -i "s/CF_PRODUCT_VERSION/${ProductVersion}/g" $DB_PROV_SCRIPT_NAME
               sed -i "s/CF_DBMS_NAME/${DBEngine}/g" $DB_PROV_SCRIPT_NAME
               sed -i "s/CF_DB_NAME/${DBName}/g" $DB_PROV_SCRIPT_NAME
               echo ${OperatingSystem}
