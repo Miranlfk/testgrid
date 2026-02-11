@@ -467,6 +467,7 @@ Resources:
                 mkdir -p /opt/aws/cfn-bootstrap-venv
                 python3 -m venv /opt/aws/cfn-bootstrap-venv
                 source /opt/aws/cfn-bootstrap-venv/bin/activate
+                pip install --upgrade pip setuptools
                 pip install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-py3-latest.tar.gz
                 ln -s /opt/aws/cfn-bootstrap-venv/bin/cfn-* /usr/local/bin/
                 deactivate
