@@ -378,7 +378,11 @@ Resources:
                   echo "Installing MariaDB database client"
                   apt install -y mariadb-client
                   echo "Installing Oracle sqlplus64 tool"
-                  apt install -y sqlplus64
+                  curl -fSL https://yum.oracle.com/repo/OracleLinux/OL8/oracle/instantclient/x86_64/getPackage/oracle-instantclient19.30-basic-19.30.0.0.0-1.el8.x86_64.rpm -o /tmp/oracle-instantclient-basic.rpm
+                  curl -fSL https://yum.oracle.com/repo/OracleLinux/OL8/oracle/instantclient/x86_64/getPackage/oracle-instantclient19.30-sqlplus-19.30.0.0.0-1.el8.x86_64.rpm -o /tmp/oracle-instantclient-sqlplus.rpm
+                  apt-get install -y alien libaio1t64
+                  alien --install --scripts /tmp/oracle-instantclient-basic.rpm
+                  alien --install --scripts /tmp/oracle-instantclient-sqlplus.rpm
                   echo "Installing MSSQL database client"
                   curl https://packages.microsoft.com/keys/microsoft.asc | sudo tee /etc/apt/trusted.gpg.d/microsoft.asc
                   curl https://packages.microsoft.com/config/ubuntu/22.04/prod.list | sudo tee /etc/apt/sources.list.d/mssql-release.list
