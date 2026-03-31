@@ -381,6 +381,7 @@ Resources:
                   curl -fSL https://yum.oracle.com/repo/OracleLinux/OL8/oracle/instantclient/x86_64/getPackage/oracle-instantclient19.30-basic-19.30.0.0.0-1.el8.x86_64.rpm -o /tmp/oracle-instantclient-basic.rpm
                   curl -fSL https://yum.oracle.com/repo/OracleLinux/OL8/oracle/instantclient/x86_64/getPackage/oracle-instantclient19.30-sqlplus-19.30.0.0.0-1.el8.x86_64.rpm -o /tmp/oracle-instantclient-sqlplus.rpm
                   apt-get install -y alien libaio1t64
+                  ln -sf /usr/lib/x86_64-linux-gnu/libaio.so.1t64 /usr/lib/x86_64-linux-gnu/libaio.so.1
                   alien --install --scripts /tmp/oracle-instantclient-basic.rpm
                   alien --install --scripts /tmp/oracle-instantclient-sqlplus.rpm
                   echo "Installing MSSQL database client"
