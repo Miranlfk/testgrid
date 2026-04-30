@@ -3,18 +3,18 @@ Description: AWS CloudFormation Template with an EC2 instance and a RDS
 Parameters:
   DB:
     Type: String
-    Default: MySQL-5.7
+    Default: MySQL-8.4
     AllowedValues:
       - Db2-11.5
       - MySQL-5.7
       - MySQL-8.0
-      - MySQL-8.4.6
-      - MariaDB-11.4.3
-      - MariaDB-11.4.8
-      - Postgres-15.10
-      - Postgres-16.6
-      - Postgres-17.6
-      - Postgres-17.5
+      - MySQL-8.4
+      - MariaDB-11.4
+      - MariaDB-11.8
+      - Postgres-15.16
+      - Postgres-16.12
+      - Postgres-17.8
+      - Postgres-18.2
       - Oracle-SE2-19.0
       - Oracle-SE2-21.0
       - SQLServer-SE-13.00
@@ -189,20 +189,20 @@ Mappings:
       DBEngine: "mysql_5.7"
     MySQL-8.0:
       DBEngine: "mysql_8.0"
-    MySQL-8.4.6:
-      DBEngine: "mysql_8.4.6"
-    MariaDB-11.4.3:
-      DBEngine: "mariadb_11.4.3"
-    MariaDB-11.4.8:
-      DBEngine: "mariadb_11.4.8"
+    MySQL-8.4:
+      DBEngine: "mysql_8.4"
+    MariaDB-11.4:
+      DBEngine: "mariadb_11.4"
+    MariaDB-11.8:
+      DBEngine: "mariadb_11.8"
     Postgres-15.10:
-      DBEngine: "postgres_15.10"
+      DBEngine: "postgres_15.16"
     Postgres-16.6:
-      DBEngine: "postgres_16.6"
-    Postgres-17.6:
-      DBEngine: "postgres_17.6"
-    Postgres-17.5:
-      DBEngine: "postgres_17.5"
+      DBEngine: "postgres_16.12"
+    Postgres-17.8:
+      DBEngine: "postgres_17.8"
+    Postgres-18.2:
+      DBEngine: "postgres_18.2"
     SQLServer-SE-13.00:
       DBEngine: "sqlserver-se_13.00"
     SQLServer-SE-14.00:
@@ -368,6 +368,7 @@ Resources:
                   dpkg --configure -a
                   apt install -y zip
                   apt install -y python3-pip
+                  apt install -y python3-setuptools
                   apt install -y jq
                   apt install -y python3-venv
                   echo "Installing PostgreSQL database client"
@@ -376,6 +377,13 @@ Resources:
                   apt install -y mysql-client
                   echo "Installing MariaDB database client"
                   apt install -y mariadb-client
+                  echo "Installing Oracle sqlplus64 tool"
+                  curl -fSL https://yum.oracle.com/repo/OracleLinux/OL8/oracle/instantclient/x86_64/getPackage/oracle-instantclient19.30-basic-19.30.0.0.0-1.el8.x86_64.rpm -o /tmp/oracle-instantclient-basic.rpm
+                  curl -fSL https://yum.oracle.com/repo/OracleLinux/OL8/oracle/instantclient/x86_64/getPackage/oracle-instantclient19.30-sqlplus-19.30.0.0.0-1.el8.x86_64.rpm -o /tmp/oracle-instantclient-sqlplus.rpm
+                  apt-get install -y alien libaio1t64
+                  ln -sf /usr/lib/x86_64-linux-gnu/libaio.so.1t64 /usr/lib/x86_64-linux-gnu/libaio.so.1
+                  alien --install --scripts /tmp/oracle-instantclient-basic.rpm
+                  alien --install --scripts /tmp/oracle-instantclient-sqlplus.rpm
                   echo "Installing MSSQL database client"
                   curl https://packages.microsoft.com/keys/microsoft.asc | sudo tee /etc/apt/trusted.gpg.d/microsoft.asc
                   curl https://packages.microsoft.com/config/ubuntu/22.04/prod.list | sudo tee /etc/apt/sources.list.d/mssql-release.list
@@ -455,8 +463,9 @@ Resources:
               fi
               if [[ ${OperatingSystem} == "Ubuntu" ]] || [[ ${OperatingSystem} == "Ubuntu-ARM" ]]; then
                 mkdir -p /opt/aws/cfn-bootstrap-venv
-                python3 -m venv /opt/aws/cfn-bootstrap-venv
+                python3 -m venv /opt/aws/cfn-bootstrap-venv --system-site-packages
                 source /opt/aws/cfn-bootstrap-venv/bin/activate
+                pip install --upgrade pip setuptools
                 pip install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-py3-latest.tar.gz
                 ln -s /opt/aws/cfn-bootstrap-venv/bin/cfn-* /usr/local/bin/
                 deactivate
@@ -474,13 +483,16 @@ Resources:
               tar -xzf apache-maven-${MavenVersion}-bin.tar.gz
               ln -fs apache-maven-${MavenVersion} maven
               echo 'export MAVEN_OPTS="-Xmx4096m -Xms2048m"' >> /etc/environment
-              echo 'export MAVEN_OPTS="--add-opens java.base/java.net=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED"' >> /etc/environment
               echo 'export M3_HOME=/opt/testgrid/workspace/maven' >> /etc/environment
               echo PATH=/opt/testgrid/workspace/maven/bin/:$PATH >> /etc/environment
+
               source /etc/environment
+
               cat /dev/null > ~/.bash_history && history -c
               ${CustomUserData}
+
               WORKING_DIR=$(pwd)
+
               # write property file
               echo "CF_DBMS_NAME=${DBEngine}" > cfn-props.properties
               echo "CF_DBMS_VERSION=${DBEngineVersion}" >> cfn-props.properties
@@ -491,6 +503,7 @@ Resources:
               echo "CF_DB_PORT=${WSO2DBInstance.Endpoint.Port}" >> cfn-props.properties
               echo "PRODUCT_PACK_LOCATION=${ProductPackLocation}" >> cfn-props.properties
               echo "SID=${DBName}" >> cfn-props.properties
+
               wget https://s3.amazonaws.com/wso2logarchiever/log_archiver/log_archiver.sh
               mv log_archiver.sh /usr/lib/
               #add product pack name to cfn properties
@@ -525,7 +538,6 @@ Resources:
               fi
               echo "Downloading the product pack"
               wget -q '${ProductPackLocation}' -O $WORKING_DIR/${ProductName}-${ProductVersion}.zip
-              unzip -q $WORKING_DIR/${ProductName}-${ProductVersion}.zip -d $WORKING_DIR
               
               /usr/local/bin/aws s3 cp s3://wum-for-testgrid/uat-config.json $WORKING_DIR/uat-config.json
               /usr/local/bin/aws s3 cp s3://wum-for-testgrid/uat-nexus-settings.xml $WORKING_DIR/uat-nexus-settings.xml
@@ -540,7 +552,7 @@ Resources:
               if [[ ${OperatingSystem} == "RHEL8" ]] || [[ ${OperatingSystem} == "RHEL9" ]] || [[ ${OperatingSystem} == "SUSE" ]] || [[ ${OperatingSystem} == "Rocky" ]] || [[ ${OperatingSystem} == "RHEL9.5" ]]; then
                 alternatives --set python /usr/bin/python2
               fi
-              wget "https://raw.githubusercontent.com/wso2/testgrid/master/jobs/intg-test-resources/update2-releases/wso2-update.sh"
+              wget "https://integration-testgrid-resources.s3.us-east-1.amazonaws.com/iam-support-scripts/wso2-update.sh" $WORKING_DIR/
               chmod +x /opt/testgrid/workspace/wso2-update.sh
               /opt/testgrid/workspace/wso2-update.sh ${WUMUsername} ${WUMPassword}
               DB_PROV_SCRIPT_NAME=provision_db_is.sh
@@ -572,7 +584,7 @@ Resources:
               elif [ $WSO2_PRODUCT_VERSION = "7.2.0" ]; then
                   WSO2_PRODUCT_VERSION_SHORT=is720
               fi
-              mkdir -p $WORKING_DIR/$WSO2_PRODUCT_VERSION_SHORT
+              mkdir $WORKING_DIR/$WSO2_PRODUCT_VERSION_SHORT
               /usr/local/bin/aws s3 cp s3://integration-testgrid-resources/db_scripts/template_db_engine_scripts/ $WORKING_DIR/$WSO2_PRODUCT_VERSION_SHORT/ --recursive
               chmod +x $DB_CONSOLIDATE_SCRIPT_NAME
               sed -i "s/CF_DBMS_NAME/${DBEngine}/g" $DB_CONSOLIDATE_SCRIPT_NAME
@@ -582,7 +594,7 @@ Resources:
               chmod +x $DB_PROV_SCRIPT_NAME
 
               echo "Database configs"
-
+              $WORKING_DIR/$DB_CONSOLIDATE_SCRIPT_NAME
               echo $DBEngine
               echo $DBEngineVersion
               bash /opt/testgrid/workspace/$DB_CONSOLIDATE_SCRIPT_NAME
@@ -593,8 +605,11 @@ Resources:
               sed -i "s/CF_DB_PORT/${WSO2DBInstance.Endpoint.Port}/g" $DB_PROV_SCRIPT_NAME
               sed -i "s/CF_DBMS_NAME/${DBEngine}/g" $DB_PROV_SCRIPT_NAME
               sed -i "s/CF_DBMS_VERSION/${DBEngineVersion}/g" $DB_PROV_SCRIPT_NAME
-              sed -i "s/PRODUCT_VERSION/${ProductVersion}/g" $DB_PROV_SCRIPT_NAME
+              sed -i "s/CF_PRODUCT_VERSION/${ProductVersion}/g" $DB_PROV_SCRIPT_NAME
+              sed -i "s/CF_DBMS_NAME/${DBEngine}/g" $DB_PROV_SCRIPT_NAME
+              sed -i "s/CF_DB_NAME/${DBName}/g" $DB_PROV_SCRIPT_NAME
               echo ${OperatingSystem}
+
               if [[ ${OperatingSystem} == "Ubuntu" ]] || [[ ${OperatingSystem} == "Ubuntu-ARM" ]]; then
                 /usr/local/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource WSO2UnixInstance --region ${AWS::Region}
               fi
