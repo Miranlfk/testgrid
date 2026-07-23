@@ -543,9 +543,9 @@ Resources:
               wget -q '${ProductPackLocation}' -O $WORKING_DIR/${ProductName}-${ProductVersion}.zip
               unzip -q ${ProductName}-${ProductVersion}.zip -d $WORKING_DIR
 
-             /usr/local/bin/aws s3 cp s3://wum-for-testgrid/uat-config.json $WORKING_DIR/uat-config.json
+              /usr/local/bin/aws s3 cp s3://wum-for-testgrid/uat-config.json $WORKING_DIR/uat-config.json
               /usr/local/bin/aws s3 cp s3://wum-for-testgrid/uat-nexus-settings.xml $WORKING_DIR/uat-nexus-settings.xml
-             
+
               if [[ ${OperatingSystem} == "Ubuntu" ]] || [[ ${OperatingSystem} == "Ubuntu-ARM" ]]; then
                 echo "Downloading authorized public keys from AWS S3"
                 /usr/local/bin/aws s3 cp s3://integration-testgrid-resources/authorized-public-keys/authorized_keys /home/ubuntu/.ssh/authorized_keys
@@ -694,7 +694,7 @@ Resources:
             [Environment]::SetEnvironmentVariable("MAVEN_HOME", "c:\\testgrid\\workspace\\apache-maven-${MavenVersion}", "Machine")
 
             $Old_Path=(Get-ItemProperty -Path 'Registry::HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment' -Name Path).Path
-            Set-ItemProperty -Path 'Registry::HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment' -Name PATH -Value ($Old_Path += ';c:\\testgrid\\workspace\\apache-maven-${MavenVersion}\\bin') -Verbose -PassThru|fl
+            Set-ItemProperty -Path 'Registry::HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment' -Name PATH -Value ($Old_Path += ';c:\\testgrid\\workspace\\apache-maven-${MavenVersion}\\bin')
 
             ${CustomUserData}
             </powershell>
