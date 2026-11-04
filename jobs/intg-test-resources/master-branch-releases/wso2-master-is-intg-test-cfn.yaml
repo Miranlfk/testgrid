@@ -196,9 +196,9 @@ Mappings:
       DBEngine: "mariadb_11.4"
     MariaDB-11.8:
       DBEngine: "mariadb_11.8"
-    Postgres-15.10:
+    Postgres-15.16:
       DBEngine: "postgres_15.16"
-    Postgres-16.6:
+    Postgres-16.12:
       DBEngine: "postgres_16.12"
     Postgres-17.8:
       DBEngine: "postgres_17.8"
@@ -225,7 +225,7 @@ Mappings:
     RHEL8:
       img: ami-0e01f0edd6f6ad4d5
     RHEL9:
-      img: ami-08845287db70c6c75
+      img: ami-0cb7fc387bfa5baa6
     SUSE:
       img: ami-009fab158dcff70e0
     Rocky:
@@ -421,6 +421,13 @@ Resources:
                 yum -y install git
               fi
               if [[ ${OperatingSystem} == "RHEL8" ]] || [[ ${OperatingSystem} == "RHEL9" ]]; then
+                if [[ ${OperatingSystem} == "RHEL9" ]]; then
+                  # Pin RHEL 9 to a fixed minor release so the dnf/yum calls below
+                  # cannot move the OS to a newer minor release (9.7 / 9.8).
+                  RHEL_MINOR=9.6
+                  echo "$RHEL_MINOR" > /etc/dnf/vars/releasever
+                  dnf clean all
+                fi
                 yum install -y zip unzip
                 yum install -y jq
                 dnf update -y
@@ -429,6 +436,8 @@ Resources:
                 fi
                 if [[ ${OperatingSystem} == "RHEL9" ]]; then
                   dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
+                  # EPEL publishes "epel-9", not "epel-9.6"; keep EPEL on releasever 9
+                  sed -i 's/\$releasever/9/g' /etc/yum.repos.d/epel*.repo
                 fi
                 yum -y install wget
                 if [[ ${OperatingSystem} == "RHEL8" ]]; then
@@ -450,6 +459,8 @@ Resources:
                 fi
                 if [[ ${OperatingSystem} == "RHEL9" ]]; then
                   yum -y install https://download.postgresql.org/pub/repos/yum/reporpms/EL-9-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+                  # Keep PGDG repos on releasever 9, independent of the RHEL minor pin
+                  sed -i 's/\$releasever/9/g' /etc/yum.repos.d/pgdg*.repo
                 fi
                 yum -y update
                 dnf -y module enable postgresql:15
@@ -599,6 +610,15 @@ Resources:
               sed -i "s/CF_PRODUCT_VERSION/${ProductVersion}/g" $DB_PROV_SCRIPT_NAME
               sed -i "s/CF_DBMS_NAME/${DBEngine}/g" $DB_PROV_SCRIPT_NAME
               sed -i "s/CF_DB_NAME/${DBName}/g" $DB_PROV_SCRIPT_NAME
+              if [[ ${OperatingSystem} == "RHEL9" ]]; then
+                # Fail the stack if the OS is no longer on the pinned minor release
+                cat /etc/redhat-release
+                if ! grep -q "release $RHEL_MINOR " /etc/redhat-release; then
+                  echo "OS version drift detected: expected RHEL $RHEL_MINOR"
+                  /opt/aws/bin/cfn-signal -e 1 --stack ${AWS::StackName} --resource WSO2UnixInstance --region ${AWS::Region}
+                  exit 1
+                fi
+              fi
               echo ${OperatingSystem}
               if [[ ${OperatingSystem} == "Ubuntu" ]] || [[ ${OperatingSystem} == "Ubuntu-ARM" ]]; then
                 /usr/local/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource WSO2UnixInstance --region ${AWS::Region}
