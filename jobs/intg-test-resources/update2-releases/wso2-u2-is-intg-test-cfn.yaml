@@ -40,7 +40,7 @@ Parameters:
       - oracle-se1
   DBEngineVersion:
     Type: String
-    Default: 5.7
+    Default: 8.4
     Description: Database Engine version
     MinLength: 1
   DBName:
@@ -159,9 +159,11 @@ Parameters:
       - ADOPT_OPEN_JDK11
       - ADOPT_OPEN_JDK17
       - ADOPT_OPEN_JDK21
+      - ADOPT_OPEN_JDK25
       - ADOPT_OPEN_JDK11_ARM
       - ADOPT_OPEN_JDK17_ARM
       - ADOPT_OPEN_JDK21_ARM
+      - ADOPT_OPEN_JDK25_ARM
       - TEMURIN_OPEN_JDK8
   MavenVersion:
     Type: String
@@ -195,9 +197,9 @@ Mappings:
       DBEngine: "mariadb_11.4"
     MariaDB-11.8:
       DBEngine: "mariadb_11.8"
-    Postgres-15.10:
+    Postgres-15.16:
       DBEngine: "postgres_15.16"
-    Postgres-16.6:
+    Postgres-16.12:
       DBEngine: "postgres_16.12"
     Postgres-17.8:
       DBEngine: "postgres_17.8"
@@ -223,7 +225,7 @@ Mappings:
     RHEL8:
       img: ami-0e01f0edd6f6ad4d5
     RHEL9:
-      img: ami-08845287db70c6c75
+      img: ami-032af20967d73c68d
     SUSE:
       img: ami-009fab158dcff70e0
     Rocky:
@@ -419,6 +421,13 @@ Resources:
                 yum -y install git
               fi
               if [[ ${OperatingSystem} == "RHEL8" ]] || [[ ${OperatingSystem} == "RHEL9" ]]; then
+                if [[ ${OperatingSystem} == "RHEL9" ]]; then
+                  # Pin RHEL 9 to a fixed minor release so the dnf/yum calls below
+                  # cannot move the OS to a newer minor release (9.7 / 9.8).
+                  RHEL_MINOR=9.6
+                  echo "$RHEL_MINOR" > /etc/dnf/vars/releasever
+                  dnf clean all
+                fi
                 yum install -y zip unzip
                 yum install -y jq
                 dnf update -y
@@ -427,6 +436,8 @@ Resources:
                 fi
                 if [[ ${OperatingSystem} == "RHEL9" ]]; then
                   dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
+                  # EPEL publishes "epel-9", not "epel-9.6"; keep EPEL on releasever 9
+                  sed -i 's/\$releasever/9/g' /etc/yum.repos.d/epel*.repo
                 fi
                 yum -y install wget
                 if [[ ${OperatingSystem} == "RHEL8" ]]; then
@@ -448,6 +459,8 @@ Resources:
                 fi
                 if [[ ${OperatingSystem} == "RHEL9" ]]; then
                   yum -y install https://download.postgresql.org/pub/repos/yum/reporpms/EL-9-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+                  # PGDG builds its URL from $releasever_major.$releasever_minor; set it to the pinned release
+                  sed -i 's/\$releasever_major\.\$releasever_minor/'"$RHEL_MINOR"'/g' /etc/yum.repos.d/pgdg*.repo
                 fi
                 yum -y update
                 dnf -y module enable postgresql:15
@@ -486,6 +499,7 @@ Resources:
               tar -xzf apache-maven-${MavenVersion}-bin.tar.gz
               ln -fs apache-maven-${MavenVersion} maven
               echo 'export MAVEN_OPTS="-Xmx4096m -Xms2048m"' >> /etc/environment
+              echo 'export MAVEN_OPTS="--add-opens java.base/java.net=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED"' >> /etc/environment
               echo 'export M3_HOME=/opt/testgrid/workspace/maven' >> /etc/environment
               echo PATH=/opt/testgrid/workspace/maven/bin/:$PATH >> /etc/environment
 
@@ -524,8 +538,11 @@ Resources:
                 ./aws/install
               fi
               /usr/local/bin/aws --version
+              # Don't echo credentials into /var/log/user-data.log
+              set +o verbose +o xtrace
               /usr/local/bin/aws configure set aws_access_key_id '${AWSAccessKeyId}'
               /usr/local/bin/aws configure set aws_secret_access_key '${AWSAccessKeySecret}'
+              set -o verbose -o xtrace
               /usr/local/bin/aws configure set default.region us-east-1
 
               aws s3 cp s3://testgrid-pipeline-logs/shutdownvm/instance-shutdown /etc/init.d/instance-shutdown
@@ -589,6 +606,8 @@ Resources:
                   WSO2_PRODUCT_VERSION_SHORT=is710
               elif [ $WSO2_PRODUCT_VERSION = "7.2.0" ]; then
                   WSO2_PRODUCT_VERSION_SHORT=is720
+              elif [ $WSO2_PRODUCT_VERSION = "7.3.0" ]; then
+                  WSO2_PRODUCT_VERSION_SHORT=is730
               fi
               mkdir $WORKING_DIR/$WSO2_PRODUCT_VERSION_SHORT
               /usr/local/bin/aws s3 cp s3://integration-testgrid-resources/db_scripts/template_db_engine_scripts/ $WORKING_DIR/$WSO2_PRODUCT_VERSION_SHORT/ --recursive
@@ -614,16 +633,28 @@ Resources:
               sed -i "s/CF_PRODUCT_VERSION/${ProductVersion}/g" $DB_PROV_SCRIPT_NAME
               sed -i "s/CF_DBMS_NAME/${DBEngine}/g" $DB_PROV_SCRIPT_NAME
               sed -i "s/CF_DB_NAME/${DBName}/g" $DB_PROV_SCRIPT_NAME
+              if [[ ${OperatingSystem} == "RHEL9" ]]; then
+                # Fail the stack if the OS is no longer on the pinned minor release
+                cat /etc/redhat-release
+                if ! grep -q "release $RHEL_MINOR " /etc/redhat-release; then
+                  echo "OS version drift detected: expected RHEL $RHEL_MINOR"
+                  /usr/local/bin/cfn-signal -e 1 --stack ${AWS::StackName} --resource WSO2UnixInstance --region ${AWS::Region}
+                  exit 1
+                fi
+              fi
               echo ${OperatingSystem}
-
               if [[ ${OperatingSystem} == "Ubuntu" ]] || [[ ${OperatingSystem} == "Ubuntu-ARM" ]]; then
                 /usr/local/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource WSO2UnixInstance --region ${AWS::Region}
               fi
               if [[ ${OperatingSystem} == "CentOS" ]]; then
                 /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource WSO2UnixInstance --region ${AWS::Region}
               fi
-              if [[ ${OperatingSystem} == "RHEL8" ]] || [[ ${OperatingSystem} == "RHEL9" ]] || [[ ${OperatingSystem} == "Rocky" ]]; then
+              if [[ ${OperatingSystem} == "RHEL8" ]] || [[ ${OperatingSystem} == "Rocky" ]]; then
                 /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource WSO2UnixInstance --region ${AWS::Region}
+              fi
+              if [[ ${OperatingSystem} == "RHEL9" ]]; then
+                # pip installs aws-cfn-bootstrap 2.x scripts here; the old /opt/aws/bin copy is incompatible
+                /usr/local/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource WSO2UnixInstance --region ${AWS::Region}
               fi
               if [[ ${OperatingSystem} == "SUSE" ]]; then
                 /usr/local/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource WSO2UnixInstance --region ${AWS::Region}
@@ -691,7 +722,7 @@ Resources:
             [Environment]::SetEnvironmentVariable("MAVEN_HOME", "c:\\testgrid\\workspace\\apache-maven-${MavenVersion}", "Machine")
 
             $Old_Path=(Get-ItemProperty -Path 'Registry::HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment' -Name Path).Path
-            Set-ItemProperty -Path 'Registry::HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment' -Name PATH -Value ($Old_Path += ';c:\\testgrid\\workspace\\apache-maven-${MavenVersion}\\bin')
+            Set-ItemProperty -Path 'Registry::HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment' -Name PATH -Value ($Old_Path += ';c:\\testgrid\\workspace\\apache-maven-${MavenVersion}\\bin') -Verbose -PassThru|fl
 
             ${CustomUserData}
             </powershell>
